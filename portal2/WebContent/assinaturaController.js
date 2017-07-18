@@ -33,8 +33,7 @@ app.controller('assinatura', ['$scope','$uibModal', function($scope, $uibModal) 
 			animation: 'true',
 			ariaLabelledBy: 'modal-title-bottom',
 			ariaDescribedBy: 'modal-body-bottom',
-			templateUrl: 'myModalContent.html',
-			controller: 'ModalInstanceCtrl'	
+			templateUrl: 'myModalContent.html'
 	    });
 	}
 	
