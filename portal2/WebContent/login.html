@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html ng-app="portal">
+<head>
+<meta charset="ISO-8859-1">
+	<title>Login</title>
+	<script src="js/jquery-3.2.1.min.js"></script>
+	<script src="js/angular-1.6.5.min.js"></script>
+	<script src="logincontroller.js"></script>
+	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+	<link href="css/style.css" rel="stylesheet">
+	<link href="css/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+	<nav class="navbar navbar-default">
+	  <div class="container-fluid">
+	    <div class="navbar-header">
+	      <a class="navbar-brand" href="#">Portal da Assinatura</a>
+	    </div>
+	    <ul class="nav navbar-nav">
+	      <li></li>
+	      <li></li>
+	      <li></li>
+	      <li></li>
+	      <li></li>
+	    </ul>
+	  </div>
+	</nav>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-md-offset-5 col-md-3">
+				<div class="form-login" ng-controller="login">
+					<h4>Autenticação</h4>
+					<input type="text" id="userName" class="form-control input-sm chat-input" placeholder="usuário" ng-model="user" />
+					</br> 
+					<input type="password" id="userPassword" class="form-control input-sm chat-input" placeholder="senha" ng-model="password" />
+					</br>
+					<div class="wrapper">
+					<button class="btn btn-primary btn-md" ng-click="update()">Login <i class="fa fa-sign-in"></i></button> 
+					</br>
+					</br>
+					<button class="btn btn-primary btn-md" >Certificado Digital <i class="fa fa-sign-in"></i></button>
+					</div>
+					<!--  
+					<div class="wrapper">
+						<span class="group-btn"> <a href="#" ng-click="update()" class="btn btn-primary btn-md">login <i class="fa fa-sign-in"></i></a>
+						</span>
+					</div>
+					-->
+					 {{message}}
+				</div>
+				<form ng-submit="submit()">
+			</div>
+		</div>
+	</div>
+	
+	<footer class="footer">
+      <div class="container">
+        <p class="text-muted">Place sticky footer content here.</p>
+      </div>
+    </footer>
+</body>
+</html>

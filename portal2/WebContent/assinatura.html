@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html ng-app="portal">
+<head>
+<meta charset="ISO-8859-1">
+	<title>Assinatura</title>
+	<script src="js/jquery-3.2.1.min.js"></script>
+	<script src="js/angular-1.6.5.min.js"></script>
+	<script src="js/ui-bootstrap-tpls-2.5.0.min.js"></script>
+	<script src="assinaturaController.js"></script>
+	<link href="css/style.css" rel="stylesheet">
+	<link href="css/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	
+</head>
+<body>
+	<!-- Barra de navegação superior -->
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+					<span class="icon-bar"></span> 
+					<span class="icon-bar"></span> 
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#">Portal da Assinatura</a>
+			</div>
+			<div class="collapse navbar-collapse" id="myNavbar">
+				<ul class="nav navbar-nav">
+					<li class="active"><a href="assinatura.html">Assinatura</a></li>
+					<li><a href="verificacao.html">Verificação</a></li>
+					<li><a href="criptografia.html">Criptografia</a></li>
+					<li><a href="ajuda.html">Ajuda</a></li>
+					<li><a href="sobre.html">Sobre o Portal</a></li>
+					<li><a href="login.html">Sair</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	
+	
+
+	<!-- Corpo da página -->
+
+	<div id="page-wrapper">
+
+		<div class="container-fluid">
+
+			<!-- Page Heading -->
+			<div class="row">
+				<div class="col-lg-12">
+					<h1 class="page-header">Assinatura de Documentos</h1>
+				</div>
+			</div>
+
+
+			<div ng-controller="assinatura">
+				<table width="100%" class="table">
+					<tr ng-repeat="linha in linhas" >
+						<td> 
+							<div class="row">
+								<div class="col-lg-2 text-center">
+									<div>
+										<button type="button" class="btn btn-danger" ng-click="remove()">
+								          <span class="glyphicon glyphicon-trash"></span> Remover
+								        </button>
+									</div>
+								</div>
+								<div class="col-lg-4 text-center">
+									<div >
+							            <div class="input-group">
+							                <label class="input-group-btn">
+							                    <span class="btn btn-primary">
+							                        Procurar&hellip; <input type="file" style="display: none;" >
+							                    </span>
+							                </label>
+							                <input type="text" class="form-control" readonly>
+							            </div>
+									</div>
+								</div>
+								<div class="col-lg-2 text-center">
+									<div>
+										<button type="button" class="btn btn-primary" ng-click="politica()">
+								          <span class="glyphicon glyphicon-cog"></span> Política
+								        </button>
+									</div>
+								</div>
+							</div>
+						</td>
+						<hr>
+					</tr>
+					
+					<tr>
+						<td><button class="btn btn-primary btn-md" ng-click="add()">
+							<span class="glyphicon glyphicon-plus"></span> ADD
+						</button>
+						<button class="btn btn-primary btn-md" ng-click="assinar()">
+							<span class="glyphicon glyphicon-pencil"></span> Assinar
+						</button></td>
+					</tr>
+					
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal Política -->
+	
+	<div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Configurações avançadas de Política</h3>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <p>Nome do arquivo:
+			<p>Tipo do arquivo: 
+			 <ul class="list-group">
+ 				<li class="list-group-item disabled">
+					<div class="radio">
+				  		<label><input type="radio" name="radiopolitica" >CMS</label>
+					</div>
+					<label class="radio-inlin"><input type="radio" name="optradio">Padrão</label>
+					<label class="radio-inlin"><input type="radio" name="optradio">CADES</label>
+				</li>
+ 				<li class="list-group-item">
+ 					<div class="radio">
+				  		<label><input type="radio" name="radiopolitica" >XLS</label>
+					</div>
+					<label class="radio-inlin"><input type="radio" name="optradio">Padrão - atachado</label>
+					<label class="radio-inlin"><input type="radio" name="optradio">Padrão - desatachado</label>
+					<label class="radio-inlin"><input type="radio" name="optradio">XADES</label>
+ 				</li>
+ 				<li class="list-group-item">
+ 					<div class="radio">
+				  		<label><input type="radio" name="radiopolitica" >PDF</label>
+					</div>
+					<label class="radio-inlin"><input type="radio" name="optradio">Padrão</label>
+					<label class="radio-inlin"><input type="radio" name="optradio">PADES</label>
+ 				</li>
+			</ul> 
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="button" ng-click="$ok()">OK</button>
+            <button class="btn btn-warning" type="button" ng-click="$cancel()">Cancel</button>
+        </div>
+	
+	<script type="text/ng-template" id="myModalContent.html">
+       <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Configurações avançadas de Política</h3>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <p>Nome do arquivo:
+			<p>Tipo do arquivo: 
+			 <ul class="list-group">
+ 				<li class="list-group-item disabled">
+					<div class="radio">
+				  		<label><input type="radio" name="radiopolitica" >CMS</label>
+					</div>
+					<label class="radio-inlin"><input type="radio" name="optradio">Padrão</label>
+					<label class="radio-inlin"><input type="radio" name="optradio">CADES</label>
+				</li>
+ 				<li class="list-group-item">
+ 					<div class="radio">
+				  		<label><input type="radio" name="radiopolitica" >XLS</label>
+					</div>
+					<label class="radio-inlin"><input type="radio" name="optradio">Padrão - atachado</label>
+					<label class="radio-inlin"><input type="radio" name="optradio">Padrão - desatachado</label>
+					<label class="radio-inlin"><input type="radio" name="optradio">XADES</label>
+ 				</li>
+ 				<li class="list-group-item">
+ 					<div class="radio">
+				  		<label><input type="radio" name="radiopolitica" >PDF</label>
+					</div>
+					<label class="radio-inlin"><input type="radio" name="optradio">Padrão</label>
+					<label class="radio-inlin"><input type="radio" name="optradio">PADES</label>
+ 				</li>
+			</ul> 
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="button" ng-click="$ok()">OK</button>
+            <button class="btn btn-warning" type="button" ng-click="$cancel()">Cancel</button>
+        </div>
+    </script>
+    
+
+	<!-- Rodapé -->
+	<footer class="footer">
+      <div class="container">
+        <p class="text-muted">Place sticky footer content here.</p>
+      </div>
+    </footer>
+	
+</body>
+</html>

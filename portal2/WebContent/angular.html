@@ -1,0 +1,56 @@
+<html ng-app>
+    <head>
+        <title>Portal da Assinatura</title>
+        <script src="http://code.angularjs.org/1.0.1/angular-1.0.1.min.js"></script>
+        <script >
+        function ListaComprasController($scope) {
+            $scope.itens = [
+                {produto: 'Leite', quantidade: 2, comprado: false},
+                {produto: 'Cerveja', quantidade: 12, comprado: false}
+            ];
+
+            $scope.adicionaItem = function () {
+                $scope.itens.push({produto: $scope.item.produto,
+                                   quantidade: $scope.item.quantidade,
+                                   comprado: false});
+              
+            };
+        }
+        
+        </script>
+    </head>
+    <body>
+    
+    
+    
+        <input type="text" ng-model="nome">
+        <p>Olá! Meu nome é: {{ nome }}</p>
+    
+        <div>
+        	<form class="form-inline" name="formItem">
+			  <input type="text" ng-model="item.produto">
+			  <input type="number" ng-model="item.quantidade">
+			  <button ng-click="adicionaItem()">adicionar ítem</button>
+			</form>
+        </div>
+        
+    <div ng-controller="ListaComprasController">
+			<table>
+				<thead>
+					<tr>
+						<th>Produto</th>
+						<th>Quantidade</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="item in itens">
+						<td><strong>{{ item.produto }}</strong></td>
+						<td>{{ item.quantidade }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+        
+		
+	</body>
+</html>
