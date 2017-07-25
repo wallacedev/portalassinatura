@@ -1,62 +1,124 @@
-var app = angular.module('portal', ['ui.bootstrap']);
+angular.module('portal', ['ngAnimate', 'ngSanitize', 'ui.bootstrap']);
 
-app.controller('assinatura', ['$scope','$uibModal', function($scope, $uibModal) {
+angular.module('portal').controller('assinatura', function($scope, $uibModal, $log, $document) {
 
-	$scope.linhas = [{nome: 'primeiro nome', politica: 'primeira politica'}];
-		
-
+	var $ctrl = this;
+	$ctrl.items = ['item1', 'item2', 'item3'];
+	$ctrl.animationsEnabled = true;
+	
+	$scope.linhas = [{index: 0, file: 'file0', filecontent:'', filetype:'', politicatipo:'', politicasubtipo:''}];
+	$scope.nome = "teste nome";
 	
 	$scope.add = function () {
+		var i = $scope.linhas.length;
 		$scope.linhas.push({
+			index: i,
+			file: "file"+i,
 			nome: 'primeiro nome',
 			politica: 'primeira politica'
 		})
 	};
 	
-	$scope.remove = function(name){				
-		var index = -1;		
-		var comArr = eval( $scope.linhas );
-		for( var i = 0; i < comArr.length; i++ ) {
-			if( comArr[i].name === name ) {
-				index = i;
-				break;
-			}
-		}
-		if( index === -1 ) {
-			alert( "Algo de errado ocorreu" );
-		}
+	$scope.remove = function(index){				
 		$scope.linhas.splice( index, 1 );		
 	};
+	
+	$scope.fileNameChanged = function (ele) {
+		var arquivo = ele.files[0].name;
+		var index = ele.name;  
+		$scope.linhas[index].filecontent = arquivo;
+		  $scope.$apply();
+	};
 
-	$scope.politica = function(){
-		$uibModal.open({
-			animation: 'true',
-			ariaLabelledBy: 'modal-title-bottom',
-			ariaDescribedBy: 'modal-body-bottom',
-			templateUrl: 'myModalContent.html'
-	    });
-	}
 	
 	$scope.assinar = function(){
 		alert("Chamar servico Java Rest para assinar");
 		
-	}
+	};
 	
+	$ctrl.politica = function (index, type, size, parentSelector) {
+		$scope.linhas[index].filetype = type;
+		var parentElem = parentSelector ? 
+	      angular.element($document[0].querySelector('.modal-demo ' + parentSelector)) : undefined;
+	    var modalInstance = $uibModal.open({
+	      animation: $ctrl.animationsEnabled,
+	      ariaLabelledBy: 'modal-title',
+	      ariaDescribedBy: 'modal-body',
+	      templateUrl: 'myModalContent.html',
+	      controller: 'ModalInstanceCtrl',
+	      controllerAs: '$ctrl',
+	      size: size,
+	      appendTo: parentElem,
+	      resolve: {
+	        items: function () {
+	          return $ctrl.items;
+	        },
+	        linha: function (){
+	          return $scope.linhas[index];	
+	        }
+	      }
+	    });
+	    
+	    modalInstance.result.then(function (selectedItem) {
+	        $ctrl.selected = selectedItem;
+	        
+	      }, function () {
+	        $log.info('Modal dismissed at: ' + new Date());
+	      });
+	 };
+		
+});
 
+angular.module('portal').controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, items, linha) {
+	  
+	
+	
+	var $ctrl = this;
+	  $ctrl.items = items;
+	  $ctrl.selected = {
+	    item: $ctrl.items[0]
+	  };
+	  
+	  $scope.data = linha;
+	  
+	  $scope.radiochange = function(value){
+			alert(value);
+			
+		};
+		
+		$scope.filename = linha.filecontent;
+		$scope.filetype = linha.filetype;
+
+		$scope.controllcms = "";
+		$scope.controllxls = "";
+		$scope.controllpdf = "";
 		
 		
-}]);
-
-angular.module('portal').controller('ModalInstanceCtrl', function ($uibModalInstance) {
+	 	if (linha.filetype == "pdf"){
+	 		$scope.controllpdf = "disabled";
+	 		$scope.radiopdf = true;
+	 	}
+	 	if (linha.filetype == "xls"){
+	 		$scope.controllxls = "disabled";
+	 		$scope.radioxls = true;
+	 	}
+	 	if (linha.filetype == "cms"){
+	 		$scope.controllcms = "disabled";
+	 		$scope.radiocms = true;
+	 	}
+		
 	  $scope.ok = function () {
-	    $uibModalInstance.close();
+	    $uibModalInstance.close($ctrl.selected.item);
 	  };
 
 	  $scope.cancel = function () {
 	    $uibModalInstance.dismiss('cancel');
 	  };
-	});
+});
 
+
+
+/*
 $(function() {
 
 	  // We can attach the `fileselect` event to all file inputs on the page
@@ -84,3 +146,6 @@ $(function() {
 	  });
 	  
 	});
+
+*/
+
