@@ -24,10 +24,17 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 	};
 	
 	$scope.fileNameChanged = function (ele) {
-		var arquivo = ele.files[0].name;
-		var index = ele.name;  
-		$scope.linhas[index].filecontent = arquivo;
-		  $scope.$apply();
+		var tipo = ele.files[0].type;
+		if(tipo != "application/pdf" &&
+		   tipo != "application/cms" &&	
+		   tipo !=  "application/vnd.sealed-xls"){
+			alert ("Formato do arquivo selecionado inválido");
+		}else{
+			var index = ele.name;  
+			$scope.linhas[index].filecontent = ele.files[0].name;
+			$scope.linhas[index].filetype = ele.files[0].type;
+			$scope.$apply();
+		}
 	};
 
 	
@@ -36,8 +43,8 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 		
 	};
 	
-	$ctrl.politica = function (index, type, size, parentSelector) {
-		$scope.linhas[index].filetype = type;
+	$ctrl.politica = function (index, size, parentSelector) {
+		//$scope.linhas[index].filetype = type;
 		var parentElem = parentSelector ? 
 	      angular.element($document[0].querySelector('.modal-demo ' + parentSelector)) : undefined;
 	    var modalInstance = $uibModal.open({
@@ -82,9 +89,9 @@ angular.module('portal').controller('ModalInstanceCtrl', function ($scope, $uibM
 	  $scope.data = linha;
 	  
 	  $scope.radiochange = function(value){
-			alert(value);
+			alert(value.value);
 			
-		};
+	  };
 		
 		$scope.filename = linha.filecontent;
 		$scope.filetype = linha.filetype;
@@ -94,15 +101,15 @@ angular.module('portal').controller('ModalInstanceCtrl', function ($scope, $uibM
 		$scope.controllpdf = "";
 		
 		
-	 	if (linha.filetype == "pdf"){
+	 	if (linha.filetype == "application/pdf"){
 	 		$scope.controllpdf = "disabled";
 	 		$scope.radiopdf = true;
 	 	}
-	 	if (linha.filetype == "xls"){
+	 	if (linha.filetype == "application/vnd.sealed-xls"){
 	 		$scope.controllxls = "disabled";
 	 		$scope.radioxls = true;
 	 	}
-	 	if (linha.filetype == "cms"){
+	 	if (linha.filetype == "application/cms"){
 	 		$scope.controllcms = "disabled";
 	 		$scope.radiocms = true;
 	 	}

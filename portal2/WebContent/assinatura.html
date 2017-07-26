@@ -83,7 +83,7 @@
 										<div class="input-group">
 											<label class="input-group-btn"> 
 												<span class="btn btn-primary"> Procurar&hellip; 
-													<input type="file" style="display: none;" name="{{$index}}" onchange="angular.element(this).scope().fileNameChanged(this)">
+													<input type="file" accept=".pdf, .cms, .xls" style="display: none;" name="{{$index}}" onchange="angular.element(this).scope().fileNameChanged(this)">
 												</span>
 											</label> 
 												<input type="text" class="form-control" ng-model="linha.filecontent" readonly>
@@ -93,7 +93,7 @@
 								<div class="col-lg-2 text-center" ng-show="linha.filecontent" >
 									<div>
 										<button type="button" class="btn btn-primary"
-											ng-click="$ctrl.politica($index, 'pdf', '', '')">
+											ng-click="$ctrl.politica($index, '', '')">
 											<span class="glyphicon glyphicon-cog"></span> Política
 										</button>
 									</div>
@@ -133,23 +133,23 @@
 					<div class="radio">
 				  		<label><input type="radio" name="radiopolitica" ng-disabled="radiocms">CMS</label>
 					</div>
-					<label class="radio-inlin"><input type="radio" name="optradio" ng-disabled="radiocms">Padrão</label>
-					<label class="radio-inlin"><input type="radio" name="optradio" ng-disabled="radiocms">CADES</label>
+					<label class="radio-inlin"><input type="radio" name="optradiocms" ng-disabled="((radiocms) || (radiopolitica.value=='xls'))">Padrão</label>
+					<label class="radio-inlin"><input type="radio" name="optradiocms" ng-disabled="((radiocms) || (radiopolitica))">CADES</label>
 				</li>
  				<li class="list-group-item {{controllxls}}">
  					<div class="radio">
-				  		<label><input type="radio" name="radiopolitica" ng-disabled="controllxls" ng-model="value" value="xls" ng-change="radiochange(value)">XLS</label>
+				  		<label><input type="radio" name="radiopolitica" ng-disabled="controllxls" ng-model="value" value="xls" ng-change="radiochange(this)">XLS</label>
 					</div>
-					<label class="radio-inlin"><input type="radio" name="optradio" ng-disabled="controllxls">Padrão - atachado</label>
-					<label class="radio-inlin"><input type="radio" name="optradio" ng-disabled="controllxls">Padrão - desatachado</label>
-					<label class="radio-inlin"><input type="radio" name="optradio" ng-disabled="controllxls">XADES</label>
+					<label class="radio-inlin"><input type="radio" name="optradioxls" ng-disabled="controllxls">Padrão - atachado</label>
+					<label class="radio-inlin"><input type="radio" name="optradioxls" ng-disabled="controllxls">Padrão - desatachado</label>
+					<label class="radio-inlin"><input type="radio" name="optradioxls" ng-disabled="controllxls">XADES</label>
  				</li>
  				<li class="list-group-item {{controllpdf}}">
  					<div class="radio">
 				  		<label><input type="radio" name="radiopolitica" ng-disabled="radiopdf">PDF</label>
 					</div>
-					<label class="radio-inlin"><input type="radio" name="optradio" ng-disabled="radiopdf">Padrão</label>
-					<label class="radio-inlin"><input type="radio" name="optradio" ng-disabled="radiopdf">PADES</label>
+					<label class="radio-inlin"><input type="radio" name="optradiopdf" ng-disabled="radiopdf">Padrão</label>
+					<label class="radio-inlin"><input type="radio" name="optradiopdf" ng-disabled="radiopdf">PADES</label>
  				</li>
 			</ul> 
         </div>
