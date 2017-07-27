@@ -83,7 +83,7 @@
 										<div class="input-group">
 											<label class="input-group-btn"> 
 												<span class="btn btn-primary"> Procurar&hellip; 
-													<input type="file" accept=".pdf, .cms, .xls" style="display: none;" name="{{$index}}" onchange="angular.element(this).scope().fileNameChanged(this)">
+													<input type="file" style="display: none;" name="{{$index}}" onchange="angular.element(this).scope().fileNameChanged(this)">
 												</span>
 											</label> 
 												<input type="text" class="form-control" ng-model="linha.filecontent" readonly>
@@ -94,7 +94,7 @@
 									<div>
 										<button type="button" class="btn btn-primary"
 											ng-click="$ctrl.politica($index, '', '')">
-											<span class="glyphicon glyphicon-cog"></span> Política
+											<span class="glyphicon glyphicon-cog"></span> Avançado
 										</button>
 									</div>
 								</div>
@@ -104,21 +104,16 @@
 					</tr>
 					<tr>
 						<td><button class="btn btn-primary btn-md" ng-click="add(indice)">
-								<span class="glyphicon glyphicon-plus"></span> ADD
+								<span class="glyphicon glyphicon-plus"></span>Adicionar
 							</button>
 							<button class="btn btn-primary btn-md" ng-click="assinar()">
 								<span class="glyphicon glyphicon-pencil"></span> Assinar
 							</button></td>
 					</tr>
 				</table>
-				<button type="button" class="btn btn-default" ng-click="$ctrl.open()">Open me!</button>
-				<div ng-show="$ctrl.selected">Selection from a modal: {{ $ctrl.selected }}</div>
 				<div class="modal-parent"></div>
-				{{meuarquivo}}
-				
-				
+				<pre>{{linhas | json}}</pre>
 				<!-- Modal Política -->
-
 
 				<script type="text/ng-template" id="myModalContent.html">
        <div class="modal-header">
@@ -126,32 +121,40 @@
             <h3 class="modal-title" id="modal-title">Configurações avançadas de Política</h3>
         </div>
         <div class="modal-body" id="modal-body">
-            <p>Nome do arquivo: {{filename}}
-			<p>Tipo do arquivo: {{filetype}}
+            <p>Nome do arquivo: {{linha.filecontent}}
+			<p>Tipo do arquivo: {{linha.filetype}}
+			<p>linha: <pre>{{linha | json}}</pre>
 			 <ul class="list-group">
- 				<li class="list-group-item {{controllcms}}">
+ 				<li class="list-group-item">
 					<div class="radio">
-				  		<label><input type="radio" name="radiopolitica" ng-disabled="radiocms">CMS</label>
+				  		<label><input type="radio" ng-model="linha.politicatipo" value="cms" name="radiopolitica" ng-change="radiochange()">CMS</label>
 					</div>
-					<label class="radio-inlin"><input type="radio" name="optradiocms" ng-disabled="((radiocms) || (radiopolitica.value=='xls'))">Padrão</label>
-					<label class="radio-inlin"><input type="radio" name="optradiocms" ng-disabled="((radiocms) || (radiopolitica))">CADES</label>
+					<div class="panel panel-default" ng-show="linha.politicatipo=='cms'">
+						<label class="radio-inlin"><input type="radio" name="optradiocms" ng-model="linha.politicasubtipo" value="padrao">Padrão</label>
+						<label class="radio-inlin"><input type="radio" name="optradiocms" ng-model="linha.politicasubtipo" value="cades">CADES</label>
+					</div>
 				</li>
- 				<li class="list-group-item {{controllxls}}">
+ 				<li class="list-group-item {{ctrldivxml}}">
  					<div class="radio">
-				  		<label><input type="radio" name="radiopolitica" ng-disabled="controllxls" ng-model="value" value="xls" ng-change="radiochange(this)">XLS</label>
+				  		<label><input type="radio" name="radiopolitica" ng-model="linha.politicatipo"  value="xml" ng-change="radiochange()" ng-disabled="ctrlradioxml">XML</label>
 					</div>
-					<label class="radio-inlin"><input type="radio" name="optradioxls" ng-disabled="controllxls">Padrão - atachado</label>
-					<label class="radio-inlin"><input type="radio" name="optradioxls" ng-disabled="controllxls">Padrão - desatachado</label>
-					<label class="radio-inlin"><input type="radio" name="optradioxls" ng-disabled="controllxls">XADES</label>
+					<div class="panel panel-default" ng-show="linha.politicatipo=='xml'">
+						<label class="radio-inlin"><input type="radio" name="optradioxml" ng-model="linha.politicasubtipo" value="padrao">Padrão - atachado</label>
+						<label class="radio-inlin"><input type="radio" name="optradioxml" ng-model="linha.politicasubtipo" value="padrao_det">Padrão - desatachado</label>
+						<label class="radio-inlin"><input type="radio" name="optradioxml" ng-model="linha.politicasubtipo" value="xades">XADES</label>
+					</div>
  				</li>
- 				<li class="list-group-item {{controllpdf}}">
+ 				<li class="list-group-item {{ctrldivpdf}}">
  					<div class="radio">
-				  		<label><input type="radio" name="radiopolitica" ng-disabled="radiopdf">PDF</label>
+				  		<label><input type="radio" name="radiopolitica" ng-model="linha.politicatipo"  value="pdf" ng-change="radiochange()" ng-disabled="{{ctrlradiopdf}}">PDF</label>
 					</div>
-					<label class="radio-inlin"><input type="radio" name="optradiopdf" ng-disabled="radiopdf">Padrão</label>
-					<label class="radio-inlin"><input type="radio" name="optradiopdf" ng-disabled="radiopdf">PADES</label>
+					<div class="panel panel-default" ng-show="linha.politicatipo=='pdf'">
+						<label class="radio-inlin"><input type="radio" name="optradiopdf" ng-model="linha.politicasubtipo" value="padrao">Padrão</label>
+						<label class="radio-inlin"><input type="radio" name="optradiopdf" ng-model="linha.politicasubtipo" value="pades">PADES</label>
+					</div>
  				</li>
 			</ul> 
+
         </div>
         <div class="modal-footer">
             <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>

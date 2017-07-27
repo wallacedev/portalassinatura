@@ -14,8 +14,6 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 		$scope.linhas.push({
 			index: i,
 			file: "file"+i,
-			nome: 'primeiro nome',
-			politica: 'primeira politica'
 		})
 	};
 	
@@ -23,18 +21,26 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 		$scope.linhas.splice( index, 1 );		
 	};
 	
-	$scope.fileNameChanged = function (ele) {
+
+	$scope.fileNameChanged = function(ele) {
 		var tipo = ele.files[0].type;
-		if(tipo != "application/pdf" &&
-		   tipo != "application/cms" &&	
-		   tipo !=  "application/vnd.sealed-xls"){
-			alert ("Formato do arquivo selecionado inválido");
-		}else{
-			var index = ele.name;  
-			$scope.linhas[index].filecontent = ele.files[0].name;
-			$scope.linhas[index].filetype = ele.files[0].type;
-			$scope.$apply();
+	
+		var index = ele.name;
+		$scope.linhas[index].filecontent = ele.files[0].name;
+		$scope.linhas[index].filetype = ele.files[0].type;
+		$scope.linhas[index].politicasubtipo = "padrao";
+		if (tipo == "application/pdf") {
+			$scope.linhas[index].politicatipo = "pdf";
+			$scope.linhas[index].estado = "pdf";
+		} else if (tipo == "text/xml") {
+			$scope.linhas[index].politicatipo = "xml";
+			$scope.linhas[index].estado = "xml";
+		} else {
+			$scope.linhas[index].politicatipo = "cms";
+			$scope.linhas[index].estado = "cms";
 		}
+		$scope.$apply();
+
 	};
 
 	
@@ -76,52 +82,55 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 		
 });
 
-angular.module('portal').controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, items, linha) {
-	  
-	
-	
-	var $ctrl = this;
-	  $ctrl.items = items;
-	  $ctrl.selected = {
-	    item: $ctrl.items[0]
-	  };
-	  
-	  $scope.data = linha;
-	  
-	  $scope.radiochange = function(value){
-			alert(value.value);
+angular.module('portal').controller('ModalInstanceCtrl',
+		function($scope, $uibModalInstance, items, linha) {
+
+			var $ctrl = this;
+			$ctrl.items = items;
+			$ctrl.selected = {
+				item : $ctrl.items[0]
+			};
+
+			$scope.linha = linha;
+
 			
-	  };
-		
-		$scope.filename = linha.filecontent;
-		$scope.filetype = linha.filetype;
+			$scope.radiochange = function() {
+				$scope.linha.politicasubtipo = "padrao";
+			};
+			
 
-		$scope.controllcms = "";
-		$scope.controllxls = "";
-		$scope.controllpdf = "";
-		
-		
-	 	if (linha.filetype == "application/pdf"){
-	 		$scope.controllpdf = "disabled";
-	 		$scope.radiopdf = true;
-	 	}
-	 	if (linha.filetype == "application/vnd.sealed-xls"){
-	 		$scope.controllxls = "disabled";
-	 		$scope.radioxls = true;
-	 	}
-	 	if (linha.filetype == "application/cms"){
-	 		$scope.controllcms = "disabled";
-	 		$scope.radiocms = true;
-	 	}
-		
-	  $scope.ok = function () {
-	    $uibModalInstance.close($ctrl.selected.item);
-	  };
+			//$scope.filename = linha.filecontent;
+			//$scope.filetype = linha.filetype;
 
-	  $scope.cancel = function () {
-	    $uibModalInstance.dismiss('cancel');
-	  };
-});
+			$scope.controllcms = "";
+			$scope.controllxml = "";
+			$scope.controllpdf = "";
+
+			
+			if (linha.estado == "pdf") {
+				$scope.ctrldivxml = "disabled";
+				$scope.ctrlradioxml = true;
+			}
+			if (linha.estado == "xml") {
+				$scope.ctrldivpdf = "disabled";
+				$scope.ctrlradiopdf = true;
+			}
+			if (linha.estado == "cms") {
+				$scope.ctrldivxml = "disabled";
+				$scope.ctrlradioxml = true;
+				$scope.ctrldivpdf = "disabled";
+				$scope.ctrlradiopdf = true;
+			}
+			
+
+			$scope.ok = function() {
+				$uibModalInstance.close($ctrl.selected.item);
+			};
+
+			$scope.cancel = function() {
+				$uibModalInstance.dismiss('cancel');
+			};
+		});
 
 
 
