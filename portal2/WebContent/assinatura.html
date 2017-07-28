@@ -118,43 +118,48 @@
 				<script type="text/ng-template" id="myModalContent.html">
        <div class="modal-header">
 			<!--<button class="close" data-dismiss="modal">&times;</button>-->
-            <h3 class="modal-title" id="modal-title">Configurações avançadas de Política</h3>
+            <h3 class="modal-title" id="modal-title">Configurações avançadas de Assinatura</h3>
         </div>
         <div class="modal-body" id="modal-body">
             <p>Nome do arquivo: {{linha.filecontent}}
 			<p>Tipo do arquivo: {{linha.filetype}}
-			<p>linha: <pre>{{linha | json}}</pre>
+			<pre>{{linha | json}}</pre>
 			 <ul class="list-group">
  				<li class="list-group-item">
-					<div class="radio">
-				  		<label><input type="radio" ng-model="linha.politicatipo" value="cms" name="radiopolitica" ng-change="radiochange()">CMS</label>
+					<div class="radio" >
+						<label class="radio-inlin"><input type="radio" ng-model="linha.politicatipo" value="cms" name="radiopolitica" ng-change="radiochange()">CMS</label>
 					</div>
-					<div class="panel panel-default" ng-show="linha.politicatipo=='cms'">
-						<label class="radio-inlin"><input type="radio" name="optradiocms" ng-model="linha.politicasubtipo" value="padrao">Padrão</label>
-						<label class="radio-inlin"><input type="radio" name="optradiocms" ng-model="linha.politicasubtipo" value="cades">CADES</label>
+   					<div class="panel panel-primary" ng-show="linha.politicatipo=='cms'">
+						<div class="panel-body" >
+							<label class="radio-inlin"><input type="radio" name="optradiocms" ng-model="linha.politicasubtipo" value="padrao">Padrão</label>
+							<label class="radio-inlin"><input type="radio" name="optradiocms" ng-model="linha.politicasubtipo" value="cades">CADES (AD-RB)</label>
+						</div>
 					</div>
 				</li>
  				<li class="list-group-item {{ctrldivxml}}">
  					<div class="radio">
 				  		<label><input type="radio" name="radiopolitica" ng-model="linha.politicatipo"  value="xml" ng-change="radiochange()" ng-disabled="ctrlradioxml">XML</label>
 					</div>
-					<div class="panel panel-default" ng-show="linha.politicatipo=='xml'">
-						<label class="radio-inlin"><input type="radio" name="optradioxml" ng-model="linha.politicasubtipo" value="padrao">Padrão - atachado</label>
-						<label class="radio-inlin"><input type="radio" name="optradioxml" ng-model="linha.politicasubtipo" value="padrao_det">Padrão - desatachado</label>
-						<label class="radio-inlin"><input type="radio" name="optradioxml" ng-model="linha.politicasubtipo" value="xades">XADES</label>
+					<div class="panel panel-primary" ng-show="linha.politicatipo=='xml'">
+						<div class="panel-body" >
+							<label class="radio-inlin"><input type="radio" name="optradioxml" ng-model="linha.politicasubtipo" value="padrao">Padrão - atachado</label>
+							<label class="radio-inlin"><input type="radio" name="optradioxml" ng-model="linha.politicasubtipo" value="padrao_det">Padrão - desatachado</label>
+							<label class="radio-inlin"><input type="radio" name="optradioxml" ng-model="linha.politicasubtipo" value="xades">XADES (AD-RB)</label>
+						</div>
 					</div>
  				</li>
  				<li class="list-group-item {{ctrldivpdf}}">
  					<div class="radio">
 				  		<label><input type="radio" name="radiopolitica" ng-model="linha.politicatipo"  value="pdf" ng-change="radiochange()" ng-disabled="{{ctrlradiopdf}}">PDF</label>
 					</div>
-					<div class="panel panel-default" ng-show="linha.politicatipo=='pdf'">
-						<label class="radio-inlin"><input type="radio" name="optradiopdf" ng-model="linha.politicasubtipo" value="padrao">Padrão</label>
-						<label class="radio-inlin"><input type="radio" name="optradiopdf" ng-model="linha.politicasubtipo" value="pades">PADES</label>
+					<div class="panel panel-primary" ng-show="linha.politicatipo=='pdf'">
+						<div class="panel-body" >
+							<label class="radio-inlin"><input type="radio" name="optradiopdf" ng-model="linha.politicasubtipo" value="padrao">Padrão</label>
+							<label class="radio-inlin"><input type="radio" name="optradiopdf" ng-model="linha.politicasubtipo" value="pades">PADES (AD-RB)</label>
+						</div>
 					</div>
  				</li>
 			</ul> 
-
         </div>
         <div class="modal-footer">
             <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
