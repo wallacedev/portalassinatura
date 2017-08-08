@@ -1,6 +1,6 @@
 angular.module('portal', ['ngAnimate', 'ngSanitize', 'ui.bootstrap']);
 
-angular.module('portal').controller('assinatura', function($scope, $uibModal, $log, $document) {
+angular.module('portal').controller('assinatura', function($scope, $uibModal, $log, $document, $http) {
 
 	var $ctrl = this;
 	$ctrl.items = ['item1', 'item2', 'item3'];
@@ -9,12 +9,15 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 	$scope.linhas = [{index: 0, file: 'file0', filecontent:'', filetype:'', politicatipo:'', politicasubtipo:''}];
 	$scope.nome = "teste nome";
 	
+	var indice = 1;
+	
 	$scope.add = function () {
-		var i = $scope.linhas.length;
+		var i = indice;
 		$scope.linhas.push({
 			index: i,
 			file: "file"+i,
 		})
+		indice = indice+1;
 	};
 	
 	$scope.remove = function(index){				
@@ -43,7 +46,28 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 	};
 	
 	$scope.assinar = function(){
-		alert("Chamar servico Java Rest para assinar");
+		$http({
+			  method: 'POST',
+			  url: 'rest/assinatura',
+			  params : {
+			        conteudo: $scope.linhas
+			        
+			  }
+			}).then(function successCallback(response) {
+			    // this callback will be called asynchronously
+			    // when the response is available
+				if(response.data == "true"){
+					alert("true");
+				}
+				else{
+					alert("false");
+				}
+			  }, function errorCallback(response) {
+			    // called asynchronously if an error occurs
+			    // or server returns response with an error status.
+				  $scope.message = "Erro no servidor.";
+		});
+		
 	};
 
 	$ctrl.politica = function(index, size, parentSelector) {

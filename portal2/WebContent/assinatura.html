@@ -66,6 +66,7 @@
 				</div>
 			</div>
 			<div ng-controller="assinatura as $ctrl" class="modal-demo">
+			<form name="formulario">
 				<table width="100%" class="table">
 					<tr ng-repeat="linha in linhas">
 						<td>
@@ -86,7 +87,7 @@
 													<input type="file" style="display: none;" name="{{$index}}" onchange="angular.element(this).scope().fileNameChanged(this)">
 												</span>
 											</label> 
-												<input type="text" class="form-control" ng-model="linha.filecontent" readonly>
+												<input type="text" class="form-control" name="linha.filecontent" ng-model="linha.filecontent" readonly required>
 										</div>
 									</div>
 								</div>
@@ -99,20 +100,21 @@
 									</div>
 								</div>
 							</div>
-							<hr>
 						</td>
 					</tr>
 					<tr>
 						<td><button class="btn btn-primary btn-md" ng-click="add(indice)">
 								<span class="glyphicon glyphicon-plus"></span>Adicionar
 							</button>
-							<button class="btn btn-primary btn-md" ng-click="assinar()">
-								<span class="glyphicon glyphicon-pencil"></span> Assinar
-							</button></td>
+						<button class="btn btn-primary btn-md" ng-click="assinar()">
+							<span class="glyphicon glyphicon-pencil"></span> Assinar
+						</button></td>
 					</tr>
 				</table>
+				</form>
+				
 				<div class="modal-parent"></div>
-				<pre>{{linhas | json}}</pre>
+				<!-- <pre>{{linhas | json}}</pre>  -->
 				<!-- Modal Política -->
 
 				<script type="text/ng-template" id="myModalContent.html">
@@ -123,7 +125,7 @@
         <div class="modal-body" id="modal-body">
             <p>Nome do arquivo: {{linha.filecontent}}
 			<p>Tipo do arquivo: {{linha.filetype}}
-			<pre>{{linha | json}}</pre>
+			<!-- <pre>{{linha | json}}</pre> -->
 			 <ul class="list-group">
  				<li class="list-group-item">
 					<div class="radio" >
