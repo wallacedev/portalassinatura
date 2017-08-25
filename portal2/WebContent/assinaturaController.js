@@ -1,13 +1,15 @@
-angular.module('portal', ['ngAnimate', 'ngSanitize', 'ui.bootstrap']);
+angular.module('portal', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'ngFileUpload']);
 
-angular.module('portal').controller('assinatura', function($scope, $uibModal, $log, $document, $http) {
+angular.module('portal').controller('assinatura', function($scope, $uibModal, $log, $document, $http, Upload) {
 
 	var $ctrl = this;
 	$ctrl.items = ['item1', 'item2', 'item3'];
 	$ctrl.animationsEnabled = true;
 	
-	$scope.linhas = [{index: 0, file: 'file0', filecontent:'', filetype:'', politicatipo:'', politicasubtipo:''}];
+	$scope.linhas = [{index: 0, file: 'file0', filename:'', filetype:'', politicatipo:'', politicasubtipo:'', file1:''}];
 	$scope.nome = "teste nome";
+	$scope.file1;
+	
 	
 	var indice = 1;
 	
@@ -28,7 +30,7 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 		var tipo = ele.files[0].type;
 	
 		var index = ele.name;
-		$scope.linhas[index].filecontent = ele.files[0].name;
+		$scope.linhas[index].filename = ele.files[0].name;
 		$scope.linhas[index].filetype = ele.files[0].type;
 		$scope.linhas[index].politicasubtipo = "padrao";
 		if (tipo == "application/pdf") {
@@ -45,7 +47,60 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 
 	};
 	
+	$scope.uploadFiles = function(file, errFiles) {
+        $scope.f = file;
+        $scope.errFile = errFiles && errFiles[0];
+        if (file) {
+            file.upload = Upload.upload({
+                url: 'rest/fileupload',
+                data: {file: file}
+            });
+
+            file.upload.then(function (response) {
+                $timeout(function () {
+                    file.result = response.data;
+                });
+            }, function (response) {
+                if (response.status > 0)
+                    $scope.errorMsg = response.status + ': ' + response.data;
+            }, function (evt) {
+                file.progress = Math.min(100, parseInt(100.0 * 
+                                         evt.loaded / evt.total));
+            });
+        }   
+    }
+	
 	$scope.assinar = function(){
+		
+		var file;
+		$scope.errFile = "";
+		var lista = $scope.linhas;
+		var size = lista.length;
+		//upload dos arquivos
+		for(var i=0; i<size; i++){
+			file = document.getElementById("file"+i).files[0];
+			//upload de 1 arquivo
+			if (file) {
+				file.upload = Upload.upload({
+					url: 'rest/fileupload',
+					data: {file: file}
+				});
+				
+				file.upload.then(function (response) {
+					$timeout(function () {
+						file.result = response.data;
+					});
+				}, function (response) {
+					if (response.status > 0)
+						$scope.errorMsg = response.status + ': ' + response.data;
+				}, function (evt) {
+					file.progress = Math.min(100, parseInt(100.0 * 
+							evt.loaded / evt.total));
+				});
+			} 
+		}
+		
+		//enviar json de cnfiguração dos arquivos
 		$http({
 			  method: 'POST',
 			  url: 'rest/assinatura',
@@ -68,7 +123,88 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 				  $scope.message = "Erro no servidor.";
 		});
 		
-	};
+		
+	};	
+	
+$scope.assinar2 = function(){
+		
+	file = document.getElementById("file0").files[0];
+	//upload de 1 arquivo
+	if (file) {
+		file.upload = Upload.upload({
+			url: 'rest/fileupload',
+			data: {file: file}
+		});
+		
+		file.upload.then(function (response) {
+			$timeout(function () {
+				file.result = response.data;
+			});
+		}, function (response) {
+			if (response.status > 0)
+				$scope.errorMsg = response.status + ': ' + response.data;
+		}, function (evt) {
+			file.progress = Math.min(100, parseInt(100.0 * 
+					evt.loaded / evt.total));
+		});
+	} 
+		
+};
+	
+		
+		
+//		// Upar a lista de arquivos
+//		var lista = $scope.linhas;
+//		var size = lista.length;
+//		for(var i=0; i<size; i++){
+//			var arquivo = lista[i].filecontent;
+//			$http({
+//				  method: 'POST',
+//				  url: 'rest/fileupload',
+//				  params : {
+//				        conteudo: $scope.linhas
+//				        
+//				  }
+//				}).then(function successCallback(response) {
+//				    // this callback will be called asynchronously
+//				    // when the response is available
+//					if(response.data == "true"){
+//						alert("true");
+//					}
+//					else{
+//						alert("false");
+//					}
+//				  }, function errorCallback(response) {
+//				    // called asynchronously if an error occurs
+//				    // or server returns response with an error status.
+//					  $scope.message = "Erro no servidor.";
+//			});
+//		}
+//		
+//		
+//		$http({
+//			  method: 'POST',
+//			  url: 'rest/assinatura',
+//			  params : {
+//			        conteudo: $scope.linhas
+//			        
+//			  }
+//			}).then(function successCallback(response) {
+//			    // this callback will be called asynchronously
+//			    // when the response is available
+//				if(response.data == "true"){
+//					alert("true");
+//				}
+//				else{
+//					alert("false");
+//				}
+//			  }, function errorCallback(response) {
+//			    // called asynchronously if an error occurs
+//			    // or server returns response with an error status.
+//				  $scope.message = "Erro no servidor.";
+//		});
+//		
+//	};
 
 	$ctrl.politica = function(index, size, parentSelector) {
 		var parentElem = parentSelector ? angular.element($document[0]
@@ -130,7 +266,7 @@ angular.module('portal').controller('ModalInstanceCtrl',
 			}
 
 			$scope.ok = function() {
-				$uibModalInstance.close($ctrl.selected.item);
+				$uibModalInstance.close();
 			};
 
 			$scope.cancel = function() {

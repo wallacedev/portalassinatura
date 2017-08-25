@@ -14,6 +14,8 @@
 	<script src="js/angular-1.6.5.min.js"></script>
 	<script src="js/angular-animate.min.js"></script>
 	<script src="js/angular-sanitize.min.js"></script>
+	<script src="js/ng-file-upload-shim.min.js"></script> <!-- for no html5 browsers support -->
+	<script src="js/ng-file-upload.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-sanitize.js"></script>
 
 	<script src="js/ui-bootstrap-tpls-2.5.0.min.js"></script>
@@ -84,14 +86,14 @@
 										<div class="input-group">
 											<label class="input-group-btn"> 
 												<span class="btn btn-primary"> Procurar&hellip; 
-													<input type="file" style="display: none;" name="{{$index}}" onchange="angular.element(this).scope().fileNameChanged(this)">
+													<input type="file" id="file{{$index}}" style="display: none;"  name="{{$index}}" onchange="angular.element(this).scope().fileNameChanged(this)">
 												</span>
 											</label> 
-												<input type="text" class="form-control" name="linha.filecontent" ng-model="linha.filecontent" readonly required>
+												<input type="text" class="form-control" name="linha.filename" ng-model="linha.filename" readonly required>
 										</div>
 									</div>
 								</div>
-								<div class="col-lg-2 text-center" ng-show="linha.filecontent" >
+								<div class="col-lg-2 text-center" ng-show="linha.filename" >
 									<div>
 										<button type="button" class="btn btn-primary"
 											ng-click="$ctrl.politica($index, '', '')">
@@ -114,7 +116,7 @@
 				</form>
 				
 				<div class="modal-parent"></div>
-				<!-- <pre>{{linhas | json}}</pre>  -->
+				 <pre>{{linhas | json}}</pre>  
 				<!-- Modal Política -->
 
 				<script type="text/ng-template" id="myModalContent.html">
@@ -123,7 +125,7 @@
             <h3 class="modal-title" id="modal-title">Configurações avançadas de Assinatura</h3>
         </div>
         <div class="modal-body" id="modal-body">
-            <p>Nome do arquivo: {{linha.filecontent}}
+            <p>Nome do arquivo: {{linha.filename}}
 			<p>Tipo do arquivo: {{linha.filetype}}
 			<!-- <pre>{{linha | json}}</pre> -->
 			 <ul class="list-group">
@@ -165,7 +167,7 @@
         </div>
         <div class="modal-footer">
             <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
-            <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+            <!--<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>-->
         </div>
    				</script>
 			</div>
