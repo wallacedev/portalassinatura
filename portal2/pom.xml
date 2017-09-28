@@ -68,5 +68,31 @@
 		    <version>2.3</version>
 		    <scope>provided</scope>
 		</dependency>
+		<!-- Certillion -->
+		<dependency>
+		  	<groupId>br.gov.pbh.certillion</groupId>
+		 	<artifactId>certillionAssinaPDBL</artifactId>
+		 	<version>0.1BETA</version>
+		</dependency>
+		<dependency>
+		  	<groupId>br.gov.pbh.certillion</groupId>
+		  	<artifactId>certillionBasePDBL</artifactId>
+		  	<version>0.1BETA</version>
+		</dependency>
+		<dependency>
+		  	<groupId>br.gov.pbh.certillion</groupId>
+		  	<artifactId>certillionTransferPDBL</artifactId>
+		  	<version>0.1BETA</version>
+		</dependency>
+		<dependency>
+		  	<groupId>commons-io</groupId>
+		  	<artifactId>commons-io</artifactId>
+		  	<version>2.4</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpcore</artifactId>
+		    <version>4.3.1</version>
+		</dependency>
     </dependencies>
 </project>

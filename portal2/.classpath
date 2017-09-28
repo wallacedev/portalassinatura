@@ -22,5 +22,10 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="libs/certillionAssinaPDBL-0.1BETA.jar"/>
+	<classpathentry kind="lib" path="libs/certillionBasePDBL-0.1BETA.jar"/>
+	<classpathentry kind="lib" path="libs/certillionTransferPDBL-0.1BETA.jar"/>
+	<classpathentry kind="lib" path="libs/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="libs/httpcore-4.3.3.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

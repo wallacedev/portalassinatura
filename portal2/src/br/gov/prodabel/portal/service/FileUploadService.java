@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
@@ -19,6 +21,14 @@ import javax.ws.rs.core.Response;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
+import br.gov.pbh.certillion.AssinaAdobePDF;
+import br.gov.pbh.certillion.AssinaArquivo;
+import br.gov.pbh.certillion.DownloadArquivo;
+import br.gov.pbh.certillion.UploadArquivo;
+import br.gov.pbh.certillion.api.ICPMException;
+import br.gov.pbh.certillion.utils.AmbienteCertillion;
+import br.gov.pbh.certillion.utils.ArquivoInfo;
+
 
 @Path("/fileupload")
 public class FileUploadService {
@@ -31,25 +41,90 @@ public class FileUploadService {
 	public Response fileUpload(@FormDataParam("file") InputStream fileInputStream,
             @FormDataParam("file") FormDataContentDisposition fileMetaData) throws Exception {
 		
-		String UPLOAD_PATH = context.getRealPath("/files/");
-	    try
-	    {
-	        int read = 0;
-	        byte[] bytes = new byte[1024];
-	 
-	        OutputStream out = new FileOutputStream(new File(UPLOAD_PATH + "/"+ fileMetaData.getFileName()));
-	        while ((read = fileInputStream.read(bytes)) != -1) 
-	        {
-	            out.write(bytes, 0, read);
-	        }
-	        out.flush();
-	        out.close();
-	    } catch (IOException e) 
-	    {
-	        throw new WebApplicationException("Error while uploading file. Please try again !!");
-	    }
+		testeCertillionUpload(fileInputStream, fileMetaData);
+		
+//		String UPLOAD_PATH = context.getRealPath("/files/");
+//	    try
+//	    {
+//	        int read = 0;
+//	        byte[] bytes = new byte[1024];
+//	 
+//	        OutputStream out = new FileOutputStream(new File(UPLOAD_PATH + "/"+ fileMetaData.getFileName()));
+//	        while ((read = fileInputStream.read(bytes)) != -1) 
+//	        {
+//	            out.write(bytes, 0, read);
+//	        }
+//	        out.flush();
+//	        out.close();
+//	    } catch (IOException e) 
+//	    {
+//	        throw new WebApplicationException("Error while uploading file. Please try again !!");
+//	    }
 	    return Response.ok("Data uploaded successfully !!").build();
 
+	}
+
+	private void testeCertillionUpload(InputStream fileInputStream, FormDataContentDisposition fileMetaData) {
+		
+		AssinaArquivo assinaArquivo = null;
+		String userIdentifier = "wallace.teixeira@pbh.gov.br";
+		String identificadorAplicacao = "Portal da assinatura";
+		ArquivoInfo arquivo = new ArquivoInfo();
+		arquivo.setNomeArquivo(fileMetaData.getFileName());
+		arquivo.setStreamArquivo(fileInputStream);
+		//arquivo.setIdentificador(1);
+		UploadArquivo uploadArquivo = null;
+		try {
+			arquivo.setStreamAssinaturaAttached(new FileOutputStream("teste.pdf"));
+			uploadArquivo = new UploadArquivo(arquivo.getStreamArquivo(), AmbienteCertillion.CERTILLION_PRODUCAO);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if(uploadArquivo != null) { 
+			arquivo.setHashArquivo(uploadArquivo.getHashArquivoUpload());
+			System.out.println("Hash - "+arquivo.getHashArquivo());
+			
+			try {
+				assinaArquivo = new AssinaAdobePDF(arquivo, userIdentifier, identificadorAplicacao, AmbienteCertillion.CERTILLION_PRODUCAO);
+				
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ICPMException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		try {
+			DownloadArquivo download = new DownloadArquivo(arquivo, AmbienteCertillion.CERTILLION_PRODUCAO);
+			
+			if (arquivo.isSigned()) {
+				System.out.println("STATUS - " + arquivo.isSigned());
+			}
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
+		
+		
 	}
 }
 

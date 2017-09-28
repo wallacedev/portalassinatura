@@ -43,8 +43,29 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 			$scope.linhas[index].politicatipo = "cms";
 			$scope.linhas[index].estado = "cms";
 		}
+		var fileName = $scope.linhas[index].file;
+		var file = document.getElementById(fileName).files;
+		var qtd = file.length;
+		var reader = new FileReader();
+		reader.readAsDataURL(file[0]);
+		reader.onload = function () {
+			$scope.linhas[index].base64 = result;
+			//$scope.linhas[index].filename = reader.result;
+//			alert(reader.result);
+//			$scope.mudaNome(reader.result, index);
+			$scope.$apply();
+		};
 		$scope.$apply();
 
+	};
+	
+	$scope.mudaNome = function(result, index) {
+//		alert(result);
+//		alert(index);
+		$scope.linhas[index].base64 = result;
+		$scope.$apply();
+		alert($scope.linhas[index].base64);
+//		$scope.linhas[index].file1 = result;
 	};
 	
 	$scope.uploadFiles = function(file, errFiles) {
