@@ -14,21 +14,25 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 	var indice = 1;
 	
 	$scope.add = function () {
-		var i = indice;
-		$scope.linhas.push({
-			index: i,
-			file: "file"+i,
-		})
-		indice = indice+1;
+		if($scope.linhas.length < 10){
+			var i = indice;
+			$scope.linhas.push({
+				index: i, file: "file"+i, filename:'', filetype:'', politicatipo:'', politicasubtipo:'', file1:''
+			})
+			indice = indice+1;
+		}else {
+			alert("Não é possível adicionar mais arquivos.");
+		}
 	};
 	
-	$scope.remove = function(index){				
-		$scope.linhas.splice( index, 1 );		
+	$scope.remove = function(index){
+		if ($scope.linhas.length > 1){
+			$scope.linhas.splice( index, 1 );		
+		}
 	};
 
 	$scope.fileNameChanged = function(ele) {
 		var tipo = ele.files[0].type;
-	
 		var index = ele.name;
 		$scope.linhas[index].filename = ele.files[0].name;
 		$scope.linhas[index].filetype = ele.files[0].type;
@@ -47,28 +51,16 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 		var file = document.getElementById(fileName).files;
 		var qtd = file.length;
 		var reader = new FileReader();
-		reader.readAsDataURL(file[0]);
-		reader.onload = function () {
-			$scope.linhas[index].base64 = result;
-			//$scope.linhas[index].filename = reader.result;
-//			alert(reader.result);
-//			$scope.mudaNome(reader.result, index);
-			$scope.$apply();
-		};
+		//Faz o upload para obter o hash
+		$scope.getHash(file[0], index);
 		$scope.$apply();
-
 	};
 	
-	$scope.mudaNome = function(result, index) {
-//		alert(result);
-//		alert(index);
-		$scope.linhas[index].base64 = result;
-		$scope.$apply();
-		alert($scope.linhas[index].base64);
-//		$scope.linhas[index].file1 = result;
+	$scope.getHash = function(file, index){
+		$scope.uploadFiles(file, null, index);
 	};
 	
-	$scope.uploadFiles = function(file, errFiles) {
+	$scope.uploadFiles = function(file, errFiles, index) {
         $scope.f = file;
         $scope.errFile = errFiles && errFiles[0];
         if (file) {
@@ -78,6 +70,8 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
             });
 
             file.upload.then(function (response) {
+            	$scope.linhas[index].hash = response.data;
+            	$scope.$apply();
                 $timeout(function () {
                     file.result = response.data;
                 });
@@ -92,36 +86,7 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
     }
 	
 	$scope.assinar = function(){
-		
-		var file;
-		$scope.errFile = "";
-		var lista = $scope.linhas;
-		var size = lista.length;
-		//upload dos arquivos
-		for(var i=0; i<size; i++){
-			file = document.getElementById("file"+i).files[0];
-			//upload de 1 arquivo
-			if (file) {
-				file.upload = Upload.upload({
-					url: 'rest/fileupload',
-					data: {file: file}
-				});
-				
-				file.upload.then(function (response) {
-					$timeout(function () {
-						file.result = response.data;
-					});
-				}, function (response) {
-					if (response.status > 0)
-						$scope.errorMsg = response.status + ': ' + response.data;
-				}, function (evt) {
-					file.progress = Math.min(100, parseInt(100.0 * 
-							evt.loaded / evt.total));
-				});
-			} 
-		}
-		
-		//enviar json de cnfiguração dos arquivos
+		//enviar json de configuração dos arquivos
 		$http({
 			  method: 'POST',
 			  url: 'rest/assinatura',
@@ -144,88 +109,38 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 				  $scope.message = "Erro no servidor.";
 		});
 		
-		
-	};	
+	};
 	
-$scope.assinar2 = function(){
+	$scope.testeDownload = function(){
+		var fileName = "test.pdf";
+	    var a = document.createElement("a");
+	    document.body.appendChild(a);
 		
-	file = document.getElementById("file0").files[0];
-	//upload de 1 arquivo
-	if (file) {
-		file.upload = Upload.upload({
-			url: 'rest/fileupload',
-			data: {file: file}
+		$http({
+			  method: 'POST',
+			  url: 'rest/download',
+			  responseType: "arraybuffer"
+			  
+			}).then(function successCallback(response) {
+			    // this callback will be called asynchronously
+			    // when the response is available
+				
+				console.log("downloadPDF callback");
+		        var file = new Blob([response.data], {type: 'application/pdf'});
+		        var fileURL = URL.createObjectURL(file);
+		        a.href = fileURL;
+		        a.download = fileName;
+		        a.click();
+				
+			  }, function errorCallback(response) {
+			    // called asynchronously if an error occurs
+			    // or server returns response with an error status.
+				  $scope.message = "Erro no servidor.";
 		});
 		
-		file.upload.then(function (response) {
-			$timeout(function () {
-				file.result = response.data;
-			});
-		}, function (response) {
-			if (response.status > 0)
-				$scope.errorMsg = response.status + ': ' + response.data;
-		}, function (evt) {
-			file.progress = Math.min(100, parseInt(100.0 * 
-					evt.loaded / evt.total));
-		});
-	} 
 		
-};
+	};
 	
-		
-		
-//		// Upar a lista de arquivos
-//		var lista = $scope.linhas;
-//		var size = lista.length;
-//		for(var i=0; i<size; i++){
-//			var arquivo = lista[i].filecontent;
-//			$http({
-//				  method: 'POST',
-//				  url: 'rest/fileupload',
-//				  params : {
-//				        conteudo: $scope.linhas
-//				        
-//				  }
-//				}).then(function successCallback(response) {
-//				    // this callback will be called asynchronously
-//				    // when the response is available
-//					if(response.data == "true"){
-//						alert("true");
-//					}
-//					else{
-//						alert("false");
-//					}
-//				  }, function errorCallback(response) {
-//				    // called asynchronously if an error occurs
-//				    // or server returns response with an error status.
-//					  $scope.message = "Erro no servidor.";
-//			});
-//		}
-//		
-//		
-//		$http({
-//			  method: 'POST',
-//			  url: 'rest/assinatura',
-//			  params : {
-//			        conteudo: $scope.linhas
-//			        
-//			  }
-//			}).then(function successCallback(response) {
-//			    // this callback will be called asynchronously
-//			    // when the response is available
-//				if(response.data == "true"){
-//					alert("true");
-//				}
-//				else{
-//					alert("false");
-//				}
-//			  }, function errorCallback(response) {
-//			    // called asynchronously if an error occurs
-//			    // or server returns response with an error status.
-//				  $scope.message = "Erro no servidor.";
-//		});
-//		
-//	};
 
 	$ctrl.politica = function(index, size, parentSelector) {
 		var parentElem = parentSelector ? angular.element($document[0]

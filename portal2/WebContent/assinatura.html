@@ -17,10 +17,7 @@
 	<script src="js/ng-file-upload-shim.min.js"></script> <!-- for no html5 browsers support -->
 	<script src="js/ng-file-upload.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-sanitize.js"></script>
-
 	<script src="js/ui-bootstrap-tpls-2.5.0.min.js"></script>
-    
-    
 	<script src="assinaturaController.js"></script>
     
 	<link href="css/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -102,6 +99,15 @@
 										</button>
 									</div>
 								</div>
+								<div class="col-lg-2 text-center" ng-show="linha.filename"  > <!--  ng-show="linha.filetodownload" -->
+									<div>
+										<button type="button" class="btn btn-link"
+											ng-click="downloadFile(linha.filetodownload)">
+											<span class="glyphicon glyphicon-download"></span> Download
+										</button>
+									</div>
+								</div>
+								
 							</div>
 						</td>
 					</tr>
@@ -109,10 +115,15 @@
 						<td><button class="btn btn-primary btn-md" ng-click="add(indice)">
 								<span class="glyphicon glyphicon-plus"></span>Adicionar
 							</button>
-						<button class="btn btn-primary btn-md" ng-click="assinar()">
-							<span class="glyphicon glyphicon-pencil"></span> Assinar
+						<button class="btn btn-primary btn-md" ng-click="testeDownload()">
+							<span class="glyphicon glyphicon-pencil"></span> Download 
 						</button></td>
 					</tr>
+						<td>
+						<button class="btn btn-success btn-block" ng-click="assinar()">
+							<span class="glyphicon glyphicon-pencil"></span> Assinar
+						</button>
+						</td>
 				</table>
 				</form>
 				

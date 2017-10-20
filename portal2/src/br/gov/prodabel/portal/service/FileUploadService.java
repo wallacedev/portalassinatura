@@ -40,8 +40,11 @@ public class FileUploadService {
 	@Consumes({MediaType.MULTIPART_FORM_DATA})
 	public Response fileUpload(@FormDataParam("file") InputStream fileInputStream,
             @FormDataParam("file") FormDataContentDisposition fileMetaData) throws Exception {
+
+		String retorno = "";
+		retorno = getFileHash(fileInputStream, fileMetaData);
 		
-		testeCertillionUpload(fileInputStream, fileMetaData);
+//		testeCertillionUpload(fileInputStream, fileMetaData);
 		
 //		String UPLOAD_PATH = context.getRealPath("/files/");
 //	    try
@@ -60,8 +63,35 @@ public class FileUploadService {
 //	    {
 //	        throw new WebApplicationException("Error while uploading file. Please try again !!");
 //	    }
-	    return Response.ok("Data uploaded successfully !!").build();
+//		retorno = "Data uploaded successfully !!";
+	    return Response.ok(retorno).build();
 
+	}
+	
+	private String getFileHash(InputStream fileInputStream, FormDataContentDisposition fileMetaData) {
+		String UPLOAD_PATH = context.getRealPath("/files/");
+		ArquivoInfo arquivo = new ArquivoInfo();
+		arquivo.setNomeArquivo(fileMetaData.getFileName());
+		arquivo.setStreamArquivo(fileInputStream);
+		//arquivo.setIdentificador(1);
+		UploadArquivo uploadArquivo = null;
+		try {
+			arquivo.setStreamAssinaturaAttached(new FileOutputStream(new File("temp.temp")));
+			uploadArquivo = new UploadArquivo(arquivo.getStreamArquivo(), AmbienteCertillion.CERTILLION_PRODUCAO);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(uploadArquivo != null) { 
+			arquivo.setHashArquivo(uploadArquivo.getHashArquivoUpload());
+		}
+		return arquivo.getHashArquivo();
 	}
 
 	private void testeCertillionUpload(InputStream fileInputStream, FormDataContentDisposition fileMetaData) {
@@ -75,7 +105,7 @@ public class FileUploadService {
 		//arquivo.setIdentificador(1);
 		UploadArquivo uploadArquivo = null;
 		try {
-			arquivo.setStreamAssinaturaAttached(new FileOutputStream("teste.pdf"));
+			arquivo.setStreamAssinaturaAttached(new FileOutputStream("teste.pdf")); 
 			uploadArquivo = new UploadArquivo(arquivo.getStreamArquivo(), AmbienteCertillion.CERTILLION_PRODUCAO);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block

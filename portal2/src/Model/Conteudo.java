@@ -3,10 +3,12 @@ package Model;
 public class Conteudo {
 	private int index;
 	private String file;
-	private String filecontent;
+	private String filename;
 	private String filetype;
 	private String politicatipo;
 	private String politicasubtipo;
+	private String base64;
+	private String hash;
 	
 	public Conteudo() {
 		
@@ -28,12 +30,12 @@ public class Conteudo {
 		this.file = file;
 	}
 
-	public String getFilecontent() {
-		return filecontent;
+	public String getFilename() {
+		return filename;
 	}
 
-	public void setFilecontent(String filecontent) {
-		this.filecontent = filecontent;
+	public void setFilename(String filename) {
+		this.filename = filename;
 	}
 
 	public String getFiletype() {
@@ -60,5 +62,19 @@ public class Conteudo {
 		this.politicasubtipo = politicasubtipo;
 	}
 	
-	
+	public String getBase64() {
+		return base64;
+	}
+
+	public void setBase64(String base64) {
+		this.base64 = base64;
+	}
+
+	public String getHash() {
+		return hash;
+	}
+
+	public void setHash(String hash) {
+		this.hash = hash;
+	}
 }
