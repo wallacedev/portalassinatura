@@ -1,12 +1,11 @@
 package br.gov.prodabel.portal.service;
 
 
-import java.io.ByteArrayOutputStream;
+import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.util.ArrayList;
@@ -19,7 +18,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -28,19 +26,25 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import Model.Conteudo;
-import br.gov.pbh.certillion.AssinaAdobePDF;
-import br.gov.pbh.certillion.AssinaArquivo;
+import Model.ListaConteudo;
+
+
 import br.gov.pbh.certillion.DownloadArquivo;
 import br.gov.pbh.certillion.UploadArquivo;
 import br.gov.pbh.certillion.api.ICPMException;
+import br.gov.pbh.certillion.api.sync.AssinaAdobePDF;
+import br.gov.pbh.certillion.api.sync.AssinaArquivo;
 import br.gov.pbh.certillion.utils.AmbienteCertillion;
-import br.gov.pbh.certillion.utils.ArquivoInfo;
+import br.gov.pbh.certillion.utils.vo.ArquivoInfo;
+
 
 @Path("/assinatura")
 public class AssinaturaService {
 	
+	public final AmbienteCertillion AMBIENTE = AmbienteCertillion.CERTILLION_PRODUCAO;
 	public String userIdentifier = "wallace.teixeira@pbh.gov.br";
 	public String identificadorAplicacao = "Portal da assinatura";
+	public List<Conteudo> listaConteudo;
 	@Context
 	public ServletContext context;
 	
@@ -49,7 +53,7 @@ public class AssinaturaService {
 	@Consumes({MediaType.APPLICATION_JSON})
 	public Response assinatura(@QueryParam("conteudo") List<String> list) {
 
-		List<Conteudo> listaConteudo = jsonToList(list);
+		listaConteudo = jsonToList(list);
 		
 		//assinarTeste(listaConteudo);
 		
@@ -158,18 +162,24 @@ public class AssinaturaService {
 //				return Response.status(200).entity(new Gson().toJson("false")).build();
 //			}
 //		}
-		return Response.status(200).entity(new Gson().toJson("true")).build();
+		return Response.status(200).entity(new Gson().toJson(listaConteudo)).build();
 	}
-	
-	
 	
 	private void assinaPDFSingle(Conteudo conteudo) {
 		String UPLOAD_PATH = context.getRealPath("/files/");
+		System.out.println("Arquivo gravado em: "+UPLOAD_PATH);
 		ArquivoInfo arquivoInfo = conteudoToArquivoInfo(conteudo);
+		File file = new File(UPLOAD_PATH);
+		if(!file.exists()) {
+			file.mkdirs();
+		}
 		try {
-			AssinaArquivo assinaArquivo = new AssinaAdobePDF(arquivoInfo, userIdentifier, identificadorAplicacao, AmbienteCertillion.CERTILLION_PRODUCAO);
+			AssinaArquivo assinaArquivo = new AssinaAdobePDF(arquivoInfo, userIdentifier, identificadorAplicacao, AMBIENTE);
 			arquivoInfo.setStreamAssinaturaAttached(new FileOutputStream(new File(UPLOAD_PATH + "/"+ arquivoInfo.getIdentificador() + "_" + arquivoInfo.getNomeArquivo())));  
-			download(arquivoInfo);
+			if (download(arquivoInfo)) {
+				setNomeArquivoDownload(arquivoInfo);
+			}
+			
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -185,18 +195,42 @@ public class AssinaturaService {
 	private void assinaPDFList(List<Conteudo> lista) {
 		List<ArquivoInfo> listaArquivoInfo = listToListArquivo(lista);
 		try {
-			AssinaArquivo assinaArquivo = new AssinaAdobePDF(listaArquivoInfo, userIdentifier, identificadorAplicacao, AmbienteCertillion.CERTILLION_PRODUCAO);
+			AssinaArquivo assinaArquivo = new AssinaAdobePDF(listaArquivoInfo, userIdentifier, identificadorAplicacao, AMBIENTE);
+			Iterator<ArquivoInfo> it = listaArquivoInfo.iterator();
+			String UPLOAD_PATH = context.getRealPath("/files/");
+			System.out.println("Arquivo gravado em: "+UPLOAD_PATH);
+			File file = new File(UPLOAD_PATH);
+			if(!file.exists()) {
+				file.mkdirs();
+			}
+			while(it.hasNext()) {
+				ArquivoInfo arquivoInfo = it.next();
+				arquivoInfo.setStreamAssinaturaAttached(new FileOutputStream(new File(UPLOAD_PATH + "/"+ arquivoInfo.getIdentificador() + "_" + arquivoInfo.getNomeArquivo())));
+				if (download(arquivoInfo)) {
+					setNomeArquivoDownload(arquivoInfo);
+				}
+			}
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ICPMException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
 	
-
-
+	private void setNomeArquivoDownload(ArquivoInfo arquivoInfo) {
+		//listaConteudo.get(index)
+		Iterator<Conteudo> it = listaConteudo.iterator();
+		while(it.hasNext()) {
+			Conteudo conteudoTemp = it.next();
+			if(conteudoTemp.getFilename().equals(arquivoInfo.getNomeArquivo())) {
+				listaConteudo.get(listaConteudo.indexOf(conteudoTemp)).setFiletodownload(arquivoInfo.getIdentificador()+"_"+arquivoInfo.getNomeArquivo());
+				break;
+			}
+		}
+		
+	}
 
 	private List<ArquivoInfo> listToListArquivo(List<Conteudo> lista) {
 		List<ArquivoInfo> listArquivoInfo = new ArrayList();
@@ -206,8 +240,6 @@ public class AssinaturaService {
 		}
 		return listArquivoInfo;
 	}
-
-
 
 	private List<Conteudo> jsonToList(List<String> list){
 		List<Conteudo> listaConteudo = new ArrayList();
@@ -221,121 +253,32 @@ public class AssinaturaService {
 		return listaConteudo;
 	}
 	
+	private String listToJson(List<Conteudo> lista) {
+		Gson gson = new GsonBuilder().create();
+		gson.toJson(lista);
+		return gson.toString();
+	}
+	
 	private boolean download(ArquivoInfo arquivo) {
 		boolean retorno = false;
 		try {
-			DownloadArquivo download = new DownloadArquivo(arquivo, AmbienteCertillion.CERTILLION_PRODUCAO);
-			
+			DownloadArquivo download = new DownloadArquivo();
+			download.downloadArquivo(arquivo, AMBIENTE);
 			if (arquivo.isSigned()) {
 				System.out.println("STATUS - " + arquivo.isSigned());
 				retorno = true;
 			}
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ProtocolException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		//salva o streming no servidor
-		
-//		String UPLOAD_PATH = context.getRealPath("/files/");
-//	    try
-//	    {
-//	     //   int read = 0;
-//	    	
-//	        //byte[] bytes = arquivo.getStreamAssinaturaAttached().;
-//	        //FileInputStream fileInputStream = arquivo.getStreamAssinaturaAttached();
-//	    	
-//	    	
-//	    	FileOutputStream assinado = (FileOutputStream) arquivo.getStreamAssinaturaAttached();  
-//	    	ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
-//	    	byteArray.writeTo(assinado);
-//	    	
-//	    	OutputStream out = new FileOutputStream(new File(UPLOAD_PATH + "/"+ arquivo.getIdentificador() + "_" + arquivo.getNomeArquivo()));
-//	    	out.write(byteArray.toByteArray());
-//	    	//IOUtils.copy(arquivo.getStreamAssinaturaAttached(), out);
-//	        
-//	        //out = arquivo.getStreamAssinaturaAttached();
-////	        while ((read = fileInputStream.read(bytes)) != -1) 
-////	        {
-////	            out.write(bytes, 0, read);
-////	        }
-//	        out.flush();
-//	        out.close();
-//	    } catch (IOException e) 
-//	    {
-//	        throw new WebApplicationException("Error while uploading file. Please try again !!");
-//	    }
-
-		
 		
 		return retorno;
 	}
 
-	private void assinarTeste(List<Conteudo> listaConteudo) {
-
-		AssinaArquivo assinaArquivo = null;
-		String userIdentifier = "wallace.teixeira@pbh.gov.br";
-		String identificadorAplicacao = "Portal da assinatura";
-		ArquivoInfo arquivo = new ArquivoInfo();
-		//arquivo.setNomeArquivo(fileMetaData.getFileName());
-		//arquivo.setStreamArquivo(fileInputStream);
-		//arquivo.setIdentificador(1);
-		UploadArquivo uploadArquivo = null;
-		try {
-			arquivo.setStreamAssinaturaAttached(new FileOutputStream("teste.pdf"));
-			uploadArquivo = new UploadArquivo(arquivo.getStreamArquivo(), AmbienteCertillion.CERTILLION_PRODUCAO);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		if(uploadArquivo != null) { 
-			arquivo.setHashArquivo(uploadArquivo.getHashArquivoUpload());
-			System.out.println("Hash - "+arquivo.getHashArquivo());
-			
-			try {
-				assinaArquivo = new AssinaAdobePDF(arquivo, userIdentifier, identificadorAplicacao, AmbienteCertillion.CERTILLION_PRODUCAO);
-				
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ICPMException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		try {
-			DownloadArquivo download = new DownloadArquivo(arquivo, AmbienteCertillion.CERTILLION_PRODUCAO);
-			
-			if (arquivo.isSigned()) {
-				System.out.println("STATUS - " + arquivo.isSigned());
-			}
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-	
 	private ArquivoInfo conteudoToArquivoInfo(Conteudo conteudo) {
 		String UPLOAD_PATH = context.getRealPath("/files/");
 		ArquivoInfo arquivoInfo = new ArquivoInfo();
@@ -349,6 +292,99 @@ public class AssinaturaService {
 //		}
 		return arquivoInfo;
 	}
+	
+	private void assinarTeste(List<Conteudo> listaConteudo) {
+
+//		AssinaArquivo assinaArquivo = null;
+//		String userIdentifier = "wallace.teixeira@pbh.gov.br";
+//		String identificadorAplicacao = "Portal da assinatura";
+//		ArquivoInfo arquivo = new ArquivoInfo();
+//		//arquivo.setNomeArquivo(fileMetaData.getFileName());
+//		//arquivo.setStreamArquivo(fileInputStream);
+//		//arquivo.setIdentificador(1);
+//		UploadArquivo uploadArquivo = null;
+//		try {
+//			arquivo.setStreamAssinaturaAttached(new FileOutputStream("teste.pdf"));
+//			uploadArquivo = new UploadArquivo(arquivo.getStreamArquivo(), AmbienteCertillion.CERTILLION_PRODUCAO);
+//		} catch (MalformedURLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (ProtocolException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//		if(uploadArquivo != null) { 
+//			arquivo.setHashArquivo(uploadArquivo.getHashArquivoUpload());
+//			System.out.println("Hash - "+arquivo.getHashArquivo());
+//			
+//			try {
+//				assinaArquivo = new AssinaAdobePDF(arquivo, userIdentifier, identificadorAplicacao, AmbienteCertillion.CERTILLION_PRODUCAO);
+//				
+//			} catch (MalformedURLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (ICPMException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//		
+//		try {
+//			DownloadArquivo download = new DownloadArquivo(arquivo, AmbienteCertillion.CERTILLION_PRODUCAO);
+//			
+//			if (arquivo.isSigned()) {
+//				System.out.println("STATUS - " + arquivo.isSigned());
+//			}
+//		} catch (MalformedURLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (ProtocolException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
+	}
+	
+	private void assinarTesteAssincrono() {
+//		try {
+//			ArquivoInfo arquivoInfo = new ArquivoInfo();
+//			arquivoInfo.setStreamArquivo(new FileInputStream(pathEntrada + File.separator + arquivoPdf));
+//			uploading(arquivoInfo);
+//			System.out.println(arquivoPdf + " - " + arquivoInfo.getHashArquivo());
+//			arquivoInfo.setNomeArquivo(arquivoPdf);
+//			AssinaAdobePDF assinador = new AssinaAdobePDF(arquivoInfo, email, identificadorAplicacao,
+//					ambienteCertillion);
+//			CertillionStatus status;
+//			int contador = 0;
+//			do {
+//				contador++;
+//				System.out.print(contador + " - ");
+//				status = VerificaAssinatura.verificaAssinatura(assinador.getIdentificadorLote(), ambienteCertillion);
+//				System.out.println(status);
+//			} while (status == CertillionStatus.TRANSACTION_IN_PROGRESS);
+//			List<ArquivoInfo> filesSigned = ValidaAssinatura.validaAssinatura(assinador.getIdentificadorLote(),
+//					ambienteCertillion);
+//			for (ArquivoInfo arquivoInfoAss : filesSigned) {
+//				arquivoInfoAss.setStreamAssinaturaAttached(
+//						new FileOutputStream(pathSaida + File.separator + arquivoInfoAss.getNomeArquivo()));
+//				downloading(arquivoInfoAss);
+//			}
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (MalformedURLException e) {
+//			e.printStackTrace();
+//		} catch (ICPMException e) {
+//			e.printStackTrace();
+//		}
+	}
+	
 }
 
 

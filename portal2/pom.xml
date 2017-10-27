@@ -72,17 +72,17 @@
 		<dependency>
 		  	<groupId>br.gov.pbh.certillion</groupId>
 		 	<artifactId>certillionAssinaPDBL</artifactId>
-		 	<version>0.1BETA</version>
+		 	<version>0.3BETA</version>
 		</dependency>
 		<dependency>
 		  	<groupId>br.gov.pbh.certillion</groupId>
 		  	<artifactId>certillionBasePDBL</artifactId>
-		  	<version>0.1BETA</version>
+		  	<version>0.3BETA</version>
 		</dependency>
 		<dependency>
 		  	<groupId>br.gov.pbh.certillion</groupId>
 		  	<artifactId>certillionTransferPDBL</artifactId>
-		  	<version>0.1BETA</version>
+		  	<version>0.3BETA</version>
 		</dependency>
 		<dependency>
 		  	<groupId>commons-io</groupId>

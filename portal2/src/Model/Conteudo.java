@@ -9,6 +9,7 @@ public class Conteudo {
 	private String politicasubtipo;
 	private String base64;
 	private String hash;
+	private String filetodownload;
 	
 	public Conteudo() {
 		
@@ -76,5 +77,13 @@ public class Conteudo {
 
 	public void setHash(String hash) {
 		this.hash = hash;
+	}
+
+	public String getFiletodownload() {
+		return filetodownload;
+	}
+
+	public void setFiletodownload(String filetodownload) {
+		this.filetodownload = filetodownload;
 	}
 }

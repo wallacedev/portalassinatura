@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 
@@ -13,7 +12,6 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -21,18 +19,17 @@ import javax.ws.rs.core.Response;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
-import br.gov.pbh.certillion.AssinaAdobePDF;
-import br.gov.pbh.certillion.AssinaArquivo;
-import br.gov.pbh.certillion.DownloadArquivo;
 import br.gov.pbh.certillion.UploadArquivo;
-import br.gov.pbh.certillion.api.ICPMException;
 import br.gov.pbh.certillion.utils.AmbienteCertillion;
-import br.gov.pbh.certillion.utils.ArquivoInfo;
+import br.gov.pbh.certillion.utils.vo.ArquivoInfo;
+
 
 
 @Path("/fileupload")
 public class FileUploadService {
 
+	private final AmbienteCertillion AMBIENTE = AmbienteCertillion.CERTILLION_PRODUCAO;
+	
 	@Context
 	public ServletContext context;
 	
@@ -77,7 +74,8 @@ public class FileUploadService {
 		UploadArquivo uploadArquivo = null;
 		try {
 			arquivo.setStreamAssinaturaAttached(new FileOutputStream(new File("temp.temp")));
-			uploadArquivo = new UploadArquivo(arquivo.getStreamArquivo(), AmbienteCertillion.CERTILLION_PRODUCAO);
+			uploadArquivo = new UploadArquivo();
+			uploadArquivo.uploadArquivo(arquivo, AMBIENTE);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -89,68 +87,69 @@ public class FileUploadService {
 			e.printStackTrace();
 		}
 		if(uploadArquivo != null) { 
-			arquivo.setHashArquivo(uploadArquivo.getHashArquivoUpload());
+			return arquivo.getHashArquivo();
 		}
-		return arquivo.getHashArquivo();
+		else return "0";
+		
 	}
 
 	private void testeCertillionUpload(InputStream fileInputStream, FormDataContentDisposition fileMetaData) {
 		
-		AssinaArquivo assinaArquivo = null;
-		String userIdentifier = "wallace.teixeira@pbh.gov.br";
-		String identificadorAplicacao = "Portal da assinatura";
-		ArquivoInfo arquivo = new ArquivoInfo();
-		arquivo.setNomeArquivo(fileMetaData.getFileName());
-		arquivo.setStreamArquivo(fileInputStream);
-		//arquivo.setIdentificador(1);
-		UploadArquivo uploadArquivo = null;
-		try {
-			arquivo.setStreamAssinaturaAttached(new FileOutputStream("teste.pdf")); 
-			uploadArquivo = new UploadArquivo(arquivo.getStreamArquivo(), AmbienteCertillion.CERTILLION_PRODUCAO);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		if(uploadArquivo != null) { 
-			arquivo.setHashArquivo(uploadArquivo.getHashArquivoUpload());
-			System.out.println("Hash - "+arquivo.getHashArquivo());
-			
-			try {
-				assinaArquivo = new AssinaAdobePDF(arquivo, userIdentifier, identificadorAplicacao, AmbienteCertillion.CERTILLION_PRODUCAO);
-				
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ICPMException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		try {
-			DownloadArquivo download = new DownloadArquivo(arquivo, AmbienteCertillion.CERTILLION_PRODUCAO);
-			
-			if (arquivo.isSigned()) {
-				System.out.println("STATUS - " + arquivo.isSigned());
-			}
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+//		AssinaArquivo assinaArquivo = null;
+//		String userIdentifier = "wallace.teixeira@pbh.gov.br";
+//		String identificadorAplicacao = "Portal da assinatura";
+//		ArquivoInfo arquivo = new ArquivoInfo();
+//		arquivo.setNomeArquivo(fileMetaData.getFileName());
+//		arquivo.setStreamArquivo(fileInputStream);
+//		//arquivo.setIdentificador(1);
+//		UploadArquivo uploadArquivo = null;
+//		try {
+//			arquivo.setStreamAssinaturaAttached(new FileOutputStream("teste.pdf")); 
+//			uploadArquivo = new UploadArquivo(arquivo.getStreamArquivo(), AmbienteCertillion.CERTILLION_PRODUCAO);
+//		} catch (MalformedURLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (ProtocolException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//		if(uploadArquivo != null) { 
+//			arquivo.setHashArquivo(uploadArquivo.getHashArquivoUpload());
+//			System.out.println("Hash - "+arquivo.getHashArquivo());
+//			
+//			try {
+//				assinaArquivo = new AssinaAdobePDF(arquivo, userIdentifier, identificadorAplicacao, AmbienteCertillion.CERTILLION_PRODUCAO);
+//				
+//			} catch (MalformedURLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (ICPMException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//		
+//		try {
+//			DownloadArquivo download = new DownloadArquivo(arquivo, AmbienteCertillion.CERTILLION_PRODUCAO);
+//			
+//			if (arquivo.isSigned()) {
+//				System.out.println("STATUS - " + arquivo.isSigned());
+//			}
+//		} catch (MalformedURLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (ProtocolException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
 		
 		
 		

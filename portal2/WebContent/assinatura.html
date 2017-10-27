@@ -65,6 +65,15 @@
 					<h1 class="page-header">Assinatura de Documentos</h1>
 				</div>
 			</div>
+			<div class="row">
+				<div class="col-lg-4">
+					<label for="email">Entre com seu email, CPF ou CNPJ:</label> <input type="email" class="form-control" id="email">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-4">
+				</div>
+			</div>
 			<div ng-controller="assinatura as $ctrl" class="modal-demo">
 			<form name="formulario">
 				<table width="100%" class="table">
@@ -84,7 +93,7 @@
 										<div class="input-group">
 											<label class="input-group-btn"> 
 												<span class="btn btn-primary"> Procurar&hellip; 
-													<input type="file" id="file{{$index}}" style="display: none;"  name="{{$index}}" onchange="angular.element(this).scope().fileNameChanged(this)">
+													<input type="file" id="file{{$index}}" style="display: none;"  name="{{$index}}" onchange="angular.element(this).scope().fileNameChanged(this)" accept=".pdf">
 												</span>
 											</label> 
 												<input type="text" class="form-control" name="linha.filename" ng-model="linha.filename" readonly required>
@@ -99,7 +108,7 @@
 										</button>
 									</div>
 								</div>
-								<div class="col-lg-2 text-center" ng-show="linha.filename"  > <!--  ng-show="linha.filetodownload" -->
+								<div class="col-lg-2 text-center" ng-show="linha.filetodownload"  > <!--  ng-show="linha.filetodownload" -->
 									<div>
 										<button type="button" class="btn btn-link"
 											ng-click="downloadFile(linha.filetodownload)">
@@ -115,12 +124,10 @@
 						<td><button class="btn btn-primary btn-md" ng-click="add(indice)">
 								<span class="glyphicon glyphicon-plus"></span>Adicionar
 							</button>
-						<button class="btn btn-primary btn-md" ng-click="testeDownload()">
-							<span class="glyphicon glyphicon-pencil"></span> Download 
-						</button></td>
+						</td>
 					</tr>
 						<td>
-						<button class="btn btn-success btn-block" ng-click="assinar()">
+						<button class="btn btn-success btn-lg" ng-click="assinar()">
 							<span class="glyphicon glyphicon-pencil"></span> Assinar
 						</button>
 						</td>
@@ -128,7 +135,7 @@
 				</form>
 				
 				<div class="modal-parent"></div>
-				 <pre>{{linhas | json}}</pre>  
+				<!--  <pre>{{linhas | json}}</pre> -->   
 				<!-- Modal Política -->
 
 				<script type="text/ng-template" id="myModalContent.html">

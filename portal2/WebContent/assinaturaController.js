@@ -6,10 +6,10 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 	$ctrl.items = ['item1', 'item2', 'item3'];
 	$ctrl.animationsEnabled = true;
 	
-	$scope.linhas = [{index: 0, file: 'file0', filename:'', filetype:'', politicatipo:'', politicasubtipo:'', file1:''}];
+	$scope.linhas = [{index: 0, file: 'file0', filename:'', filetype:'', politicatipo:'', politicasubtipo:''}];
 	$scope.nome = "teste nome";
 	$scope.file1;
-	
+	$scope.identificacao;
 	
 	var indice = 1;
 	
@@ -17,7 +17,7 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 		if($scope.linhas.length < 10){
 			var i = indice;
 			$scope.linhas.push({
-				index: i, file: "file"+i, filename:'', filetype:'', politicatipo:'', politicasubtipo:'', file1:''
+				index: i, file: "file"+i, filename:'', filetype:'', politicatipo:'', politicasubtipo:'' 
 			})
 			indice = indice+1;
 		}else {
@@ -86,6 +86,8 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
     }
 	
 	$scope.assinar = function(){
+		alert("Digite sua assinatura no dispositivo do certillion");
+		
 		//enviar json de configuração dos arquivos
 		$http({
 			  method: 'POST',
@@ -97,12 +99,15 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 			}).then(function successCallback(response) {
 			    // this callback will be called asynchronously
 			    // when the response is available
-				if(response.data == "true"){
-					alert("true");
+				if(response.data != "false"){
+					alert("Assinatura realizada com sucesso!");
 				}
 				else{
-					alert("false");
+					alert("Erro na assinatura!");
 				}
+				$scope.linhas = "";
+				$scope.linhas = response.data;
+				$scope.$apply();
 			  }, function errorCallback(response) {
 			    // called asynchronously if an error occurs
 			    // or server returns response with an error status.
@@ -111,15 +116,19 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 		
 	};
 	
-	$scope.testeDownload = function(){
-		var fileName = "test.pdf";
+	$scope.downloadFile = function(fileName){
+		
 	    var a = document.createElement("a");
 	    document.body.appendChild(a);
-		
+	    console.log(fileName);
 		$http({
 			  method: 'POST',
 			  url: 'rest/download',
-			  responseType: "arraybuffer"
+			  responseType: "arraybuffer",
+			  params : {
+			        filename: fileName
+			        
+			  }
 			  
 			}).then(function successCallback(response) {
 			    // this callback will be called asynchronously
@@ -137,8 +146,6 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 			    // or server returns response with an error status.
 				  $scope.message = "Erro no servidor.";
 		});
-		
-		
 	};
 	
 
