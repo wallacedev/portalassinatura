@@ -9,7 +9,7 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 	$scope.linhas = [{index: 0, file: 'file0', filename:'', filetype:'', politicatipo:'', politicasubtipo:''}];
 	$scope.nome = "teste nome";
 	$scope.file1;
-	$scope.identificacao;
+	
 	
 	var indice = 1;
 	
@@ -86,6 +86,7 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
     }
 	
 	$scope.assinar = function(){
+		$scope.linhas[0].identificador = $scope.identificador;
 		alert("Digite sua assinatura no dispositivo do certillion");
 		
 		//enviar json de configuração dos arquivos
@@ -101,12 +102,12 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 			    // when the response is available
 				if(response.data != "false"){
 					alert("Assinatura realizada com sucesso!");
+					$scope.linhas = "";
+					$scope.linhas = response.data;
 				}
 				else{
 					alert("Erro na assinatura!");
 				}
-				$scope.linhas = "";
-				$scope.linhas = response.data;
 				$scope.$apply();
 			  }, function errorCallback(response) {
 			    // called asynchronously if an error occurs

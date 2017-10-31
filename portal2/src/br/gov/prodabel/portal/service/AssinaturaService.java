@@ -1,7 +1,6 @@
 package br.gov.prodabel.portal.service;
 
 
-import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -26,11 +25,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import Model.Conteudo;
-import Model.ListaConteudo;
-
-
 import br.gov.pbh.certillion.DownloadArquivo;
-import br.gov.pbh.certillion.UploadArquivo;
 import br.gov.pbh.certillion.api.ICPMException;
 import br.gov.pbh.certillion.api.sync.AssinaAdobePDF;
 import br.gov.pbh.certillion.api.sync.AssinaArquivo;
@@ -42,6 +37,7 @@ import br.gov.pbh.certillion.utils.vo.ArquivoInfo;
 public class AssinaturaService {
 	
 	public final AmbienteCertillion AMBIENTE = AmbienteCertillion.CERTILLION_PRODUCAO;
+	public boolean statusAssinatura = true;
 	public String userIdentifier = "wallace.teixeira@pbh.gov.br";
 	public String identificadorAplicacao = "Portal da assinatura";
 	public List<Conteudo> listaConteudo;
@@ -54,7 +50,7 @@ public class AssinaturaService {
 	public Response assinatura(@QueryParam("conteudo") List<String> list) {
 
 		listaConteudo = jsonToList(list);
-		
+		userIdentifier = listaConteudo.get(0).getIdentificador();
 		//assinarTeste(listaConteudo);
 		
 		List<Conteudo> listaPDFPadrao = new ArrayList();
@@ -153,16 +149,10 @@ public class AssinaturaService {
 		}else if (listaCMSCades.size()>1) {
 			//bath
 		}
-		
-//		if (listaConteudo != null) {
-//			if (listaConteudo.size() > 0 ) {
-//				return Response.status(200).entity(new Gson().toJson("true")).build();
-//			}
-//			else {
-//				return Response.status(200).entity(new Gson().toJson("false")).build();
-//			}
-//		}
-		return Response.status(200).entity(new Gson().toJson(listaConteudo)).build();
+		if (statusAssinatura == true) {
+			return Response.status(200).entity(new Gson().toJson(listaConteudo)).build();
+		}
+		return Response.status(200).entity(new Gson().toJson("false")).build();
 	}
 	
 	private void assinaPDFSingle(Conteudo conteudo) {
@@ -182,12 +172,15 @@ public class AssinaturaService {
 			
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
+			statusAssinatura = false;
 			e.printStackTrace();
 		} catch (ICPMException e) {
 			// TODO Auto-generated catch block
+			statusAssinatura = false;
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
+			statusAssinatura = false;
 			e.printStackTrace();
 		}
 	}
@@ -211,10 +204,13 @@ public class AssinaturaService {
 				}
 			}
 		} catch (MalformedURLException e) {
+			statusAssinatura = false;
 			e.printStackTrace();
 		} catch (ICPMException e) {
+			statusAssinatura = false;
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
+			statusAssinatura = false;
 			e.printStackTrace();
 		}
 	}

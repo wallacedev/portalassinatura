@@ -60,22 +60,27 @@
 	<div id="page-wrapper">
 		<div class="container-fluid">
 			<!-- Page Heading -->
+			<div ng-controller="assinatura as $ctrl" class="modal-demo">
 			<div class="row">
 				<div class="col-lg-12">
 					<h1 class="page-header">Assinatura de Documentos</h1>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-lg-4">
-					<label for="email">Entre com seu email, CPF ou CNPJ:</label> <input type="email" class="form-control" id="email">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-lg-4">
-				</div>
-			</div>
-			<div ng-controller="assinatura as $ctrl" class="modal-demo">
 			<form name="formulario">
+					<div class="row">
+						<div class="col-lg-4">
+							<label for="email">Entre com seu email:</label> <input	type="email" class="form-control" ng-model="identificador" name="identificador" required>
+								<span style="color: red" ng-show="formulario.identificador.$dirty && formulario.identificador.$invalid"> 
+									<span ng-show="formulario.identificador.$error.required">Email é obrigatório.</span>
+									<span ng-show="formulario.identificador.$error.email">Endereço de email inválido.</span>
+								</span>
+						</div>
+					</div>
+					<div class="row">
+				<div class="col-lg-4">
+					<h1></h1>
+				</div>
+			</div>
 				<table width="100%" class="table">
 					<tr ng-repeat="linha in linhas">
 						<td>
@@ -127,15 +132,17 @@
 						</td>
 					</tr>
 						<td>
-						<button class="btn btn-success btn-lg" ng-click="assinar()">
+						<button class="btn btn-success btn-lg" ng-click="assinar()" ng-disabled="formulario.identificador.$invalid" >
 							<span class="glyphicon glyphicon-pencil"></span> Assinar
 						</button>
+						{{formulario.linha.$invalid}}
 						</td>
 				</table>
 				</form>
 				
 				<div class="modal-parent"></div>
-				<!--  <pre>{{linhas | json}}</pre> -->   
+				<!--  <pre> {{linhas[0].filename}}</pre> -->
+				<!--  <pre>{{linhas | json}}</pre> -->
 				<!-- Modal Política -->
 
 				<script type="text/ng-template" id="myModalContent.html">
@@ -196,7 +203,7 @@
 	<!-- Rodapé -->
 	<footer class="footer">
       <div class="container">
-        <p class="text-muted">Place sticky footer content here.</p>
+        <p class="text-muted">Rodapé</p>
       </div>
     </footer>
 </body>

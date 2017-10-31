@@ -10,6 +10,7 @@ public class Conteudo {
 	private String base64;
 	private String hash;
 	private String filetodownload;
+	private String identificador;
 	
 	public Conteudo() {
 		
@@ -85,5 +86,13 @@ public class Conteudo {
 
 	public void setFiletodownload(String filetodownload) {
 		this.filetodownload = filetodownload;
+	}
+
+	public String getIdentificador() {
+		return identificador;
+	}
+
+	public void setIdentificador(String identificador) {
+		this.identificador = identificador;
 	}
 }
