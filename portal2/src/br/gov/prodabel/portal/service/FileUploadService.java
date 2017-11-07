@@ -73,18 +73,21 @@ public class FileUploadService {
 		//arquivo.setIdentificador(1);
 		UploadArquivo uploadArquivo = null;
 		try {
-			arquivo.setStreamAssinaturaAttached(new FileOutputStream(new File("temp.temp")));
+			//arquivo.setStreamAssinaturaAttached(new FileOutputStream(new File("temp.temp")));
 			uploadArquivo = new UploadArquivo();
 			uploadArquivo.uploadArquivo(arquivo, AMBIENTE);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return "0";
 		} catch (ProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return "0";
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return "0";
 		}
 		if(uploadArquivo != null) { 
 			return arquivo.getHashArquivo();

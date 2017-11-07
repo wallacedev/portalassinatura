@@ -9,7 +9,7 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 	$scope.linhas = [{index: 0, file: 'file0', filename:'', filetype:'', politicatipo:'', politicasubtipo:''}];
 	$scope.nome = "teste nome";
 	$scope.file1;
-	
+	$scope.file = 0;
 	
 	var indice = 1;
 	
@@ -70,50 +70,30 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
             });
 
             file.upload.then(function (response) {
-            	$scope.linhas[index].hash = response.data;
-            	$scope.$apply();
-                $timeout(function () {
+            	if (response.data != "0"){
+            		$scope.linhas[index].hash = response.data;
+            		$scope.$apply();
+            	}else{
+            		alert("Não foi possível realizar o upload do arquivo.");
+            	}
+            	$timeout(function () {
                     file.result = response.data;
                 });
             }, function (response) {
                 if (response.status > 0)
                     $scope.errorMsg = response.status + ': ' + response.data;
             }, function (evt) {
-                file.progress = Math.min(100, parseInt(100.0 * 
+            	$scope.linhas[index].fileprogress = Math.min(100, parseInt(100.0 * 
                                          evt.loaded / evt.total));
             });
         }   
     }
 	
 	$scope.assinar = function(){
-		$scope.linhas[0].identificador = $scope.identificador;
-		alert("Digite sua assinatura no dispositivo do certillion");
 		
-		//enviar json de configuração dos arquivos
-		$http({
-			  method: 'POST',
-			  url: 'rest/assinatura',
-			  params : {
-			        conteudo: $scope.linhas
-			        
-			  }
-			}).then(function successCallback(response) {
-			    // this callback will be called asynchronously
-			    // when the response is available
-				if(response.data != "false"){
-					alert("Assinatura realizada com sucesso!");
-					$scope.linhas = "";
-					$scope.linhas = response.data;
-				}
-				else{
-					alert("Erro na assinatura!");
-				}
-				$scope.$apply();
-			  }, function errorCallback(response) {
-			    // called asynchronously if an error occurs
-			    // or server returns response with an error status.
-				  $scope.message = "Erro no servidor.";
-		});
+		$scope.linhas[0].identificador = $scope.identificador;
+		$ctrl.assinaprogress('','');
+		$scope.$apply();
 		
 	};
 	
@@ -178,6 +158,37 @@ angular.module('portal').controller('assinatura', function($scope, $uibModal, $l
 			$log.info('Modal dismissed at: ' + new Date());
 		});
 	};
+	
+	$ctrl.assinaprogress = function(size, parentSelector) {
+		var parentElem = parentSelector ? angular.element($document[0]
+				.querySelector('.modal-demo ' + parentSelector))
+				: undefined;
+
+		var modalInstance = $uibModal.open({
+			animation : $ctrl.animationsEnabled,
+			ariaLabelledBy : 'modal-title',
+			ariaDescribedBy : 'modal-body',
+			templateUrl : 'modalAguardaAssinatura.html',
+			controller : 'ModalInstanceAssina',
+			controllerAs : '$ctrl',
+			size : size,
+			backdrop: 'static',
+			appendTo : parentElem,
+			resolve : {
+				linhas : function() {
+					return $scope.linhas;
+				}
+			}
+		});
+
+		modalInstance.result.then(function(result) {
+			$scope.linhas = result;
+
+		}, function() {
+			$log.info('Modal dismissed at: ' + new Date());
+		});
+	};
+	
 		
 });
 
@@ -211,6 +222,57 @@ angular.module('portal').controller('ModalInstanceCtrl',
 
 			$scope.ok = function() {
 				$uibModalInstance.close();
+			};
+
+			$scope.cancel = function() {
+				$uibModalInstance.dismiss('cancel');
+			};
+		});
+
+angular.module('portal').controller('ModalInstanceAssina',
+		function($scope, $uibModalInstance, $http, linhas) {
+
+			$scope.controle = "Aguardando assinatura. Verifique seu dispositivo Certillion!";
+			$scope.linhas = linhas;
+			$scope.controlebtn = false;
+			//$scope.linhas = linhas;
+			
+			//linhas = ""; 			
+			//enviar json de configuração dos arquivos
+			$http({
+				  method: 'POST',
+				  url: 'rest/assinatura',
+				  params : {
+				        conteudo: linhas
+				        
+				  }
+				}).then(function successCallback(response) {
+				    // this callback will be called asynchronously
+				    // when the response is available
+					if(response.data != "false"){
+						//alert("Assinatura realizada com sucesso!");
+						linhas = "";
+						linhas = response.data;
+						$scope.linhas = linhas;
+						$scope.controle = "Assinatura realizada com sucesso!";
+						$scope.controlebtn = true;
+						
+					}
+					else{
+						$scope.controle = "Ocorreu um erro durante a assinatura!";
+						$scope.controlebtn = true;
+					}
+					$scope.$apply();
+				  }, function errorCallback(response) {
+				    // called asynchronously if an error occurs
+				    // or server returns response with an error status.
+					  $scope.message = "Erro no servidor.";
+					  $scope.controle = "Ocorreu um erro durante a assinatura!";
+					  $scope.controlebtn = true;
+			});
+
+			$scope.ok = function() {
+				$uibModalInstance.close(linhas);
 			};
 
 			$scope.cancel = function() {
