@@ -90,7 +90,10 @@ public class FileUploadService {
 			return "0";
 		}
 		if(uploadArquivo != null) { 
-			return arquivo.getHashArquivo();
+			if (arquivo.getHashArquivo() != null) {
+				return arquivo.getHashArquivo();
+			}
+			else return "0";
 		}
 		else return "0";
 		
